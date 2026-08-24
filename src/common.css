@@ -276,8 +276,6 @@ body:not(.light-mode) .data-table th {
   margin-top: 2.5rem;
 }
 
-}
-
 /* Drawers */
 .drawer-overlay {
   position: fixed;
