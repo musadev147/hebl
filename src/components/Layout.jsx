@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import InvoiceHeader from './InvoiceHeader';
+import logoImg from '../assets/ehbl.jpeg';
 import './Layout.css';
 
 const Layout = () => {
@@ -72,7 +73,7 @@ const Layout = () => {
       <aside className="sidebar glass">
         <div className="sidebar-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <img src="/src/assets/ehbl.jpeg" alt="EHBL Logo" style={{ height: '45px', width: '45px', borderRadius: '8px', objectFit: 'contain', background: 'white' }} />
+            <img src={logoImg} alt="EHBL Logo" style={{ height: '45px', width: '45px', borderRadius: '8px', objectFit: 'contain', background: 'white' }} />
             <div>
               <h2>EHBL</h2>
               <span className="role-badge">{user?.role}</span>

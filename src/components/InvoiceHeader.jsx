@@ -1,11 +1,12 @@
 import React from 'react';
+import logoImg from '../assets/ehbl.jpeg';
 
 const InvoiceHeader = () => {
   return (
     <div style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#000', fontFamily: 'Arial, sans-serif' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px', marginBottom: '10px' }}>
         <img 
-          src="/src/assets/ehbl.jpeg" 
+          src={logoImg} 
           alt="EHBL Logo" 
           style={{ height: '60px', width: '60px', borderRadius: '50%', objectFit: 'contain' }} 
         />
