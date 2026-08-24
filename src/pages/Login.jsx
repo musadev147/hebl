@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useStore from '../store/useStore';
 import { Lock, User } from 'lucide-react';
+import logoImg from '../assets/ehbl.jpeg';
 import './Login.css'; // We'll add some specific styling here
 
 const Login = () => {
@@ -22,7 +23,7 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card card animate-fade-in">
         <div className="login-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: '1rem' }}>
-          <img src="/src/assets/ehbl.jpeg" alt="EHBL Logo" style={{ height: '100px', width: 'auto', objectFit: 'contain', marginBottom: '15px' }} />
+          <img src={logoImg} alt="EHBL Logo" style={{ height: '100px', width: 'auto', objectFit: 'contain', marginBottom: '15px' }} />
           <p style={{ margin: 0, color: '#64748b', fontSize: '1.1rem' }}>Login to your account</p>
         </div>
         <form onSubmit={handleLogin} className="login-form">
