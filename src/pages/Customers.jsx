@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Search, MessageSquare, Phone, Printer, Eye, Download } from 'lucide-react';
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
+import InvoiceHeader from '../components/InvoiceHeader';
 
 const Customers = () => {
   const { customers, suppliers, settleCustomerDue, settleSupplierDue, sales, purchases, settlements } = useStore();
@@ -183,8 +184,8 @@ const Customers = () => {
 
       {/* Hidden Printable List (Excel Style) */}
       <div id="printable-customers-list" style={{ display: 'none' }}>
-        <div style={{ padding: '1.5rem', background: '#fff', color: '#000', fontFamily: 'sans-serif' }}>
-          <h2 style={{ textAlign: 'center', fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+        <div style={{ padding: '2rem', background: '#fff', color: '#000' }}>
+          <InvoiceHeader />
           <p style={{ textAlign: 'center', fontSize: '1rem', marginBottom: '1.5rem', color: '#333' }}>
             {activeTab === 'Customer' ? 'Customers' : 'Suppliers'} Due List
           </p>
@@ -325,7 +326,7 @@ const Customers = () => {
             
             <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
               <div id="printable-single-person" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
-                 <h2 style={{ textAlign: 'center', marginBottom: '0.5rem', color: '#000', fontSize: '1.5rem', fontWeight: 'bold' }}>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+                 <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
                    Due Statement<br/>
                    Date: {new Date().toLocaleDateString()}

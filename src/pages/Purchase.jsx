@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Plus, Minus, Search, Trash2, Database, List, Printer, FilePlus, Eye, Download, FileText } from 'lucide-react';
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
+import InvoiceHeader from '../components/InvoiceHeader';
 import './Purchase.css';
 
 const Purchase = () => {
@@ -11,10 +12,12 @@ const Purchase = () => {
   
   const [supplier, setSupplier] = useState('');
   const [paymentType, setPaymentType] = useState('Cash');
+  const [paidAmount, setPaidAmount] = useState('');
   const [items, setItems] = useState([{ productId: '', name: '', quantity: 1, price: 0 }]);
   
   // Quick Entry State
   const [tempProductId, setTempProductId] = useState('');
+  const [tempVariant, setTempVariant] = useState('');
   const [tempQty, setTempQty] = useState(1);
   const [tempPrice, setTempPrice] = useState(0);
 
@@ -88,11 +91,25 @@ const Purchase = () => {
             </div>
             <div className="qe-field">
               <label>Payment</label>
-              <select value={paymentType} onChange={(e) => setPaymentType(e.target.value)} style={{ width: '120px' }}>
+              <select value={paymentType} onChange={(e) => { setPaymentType(e.target.value); setPaidAmount(''); }} style={{ width: '120px' }}>
                 <option value="Cash">Cash</option>
                 <option value="Baki">Baki</option>
+                <option value="Partial">Partial</option>
               </select>
             </div>
+            {paymentType === 'Partial' && (
+              <div className="qe-field">
+                <label>Paid Amt (৳)</label>
+                <input 
+                  type="number" 
+                  min="0"
+                  placeholder="Amount" 
+                  value={paidAmount} 
+                  onChange={(e) => setPaidAmount(e.target.value)} 
+                  style={{ width: '100px' }} 
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -114,6 +131,15 @@ const Purchase = () => {
             <datalist id="inventory-products">
               {inventory.map(p => <option key={p.id} value={p.name}>{p.name} (Stock: {p.stock})</option>)}
             </datalist>
+          </div>
+          <div className="qe-field">
+            <label>Variant</label>
+            <input 
+              type="text" 
+              placeholder="e.g. Red, XL" 
+              value={tempVariant}
+              onChange={(e) => setTempVariant(e.target.value)}
+            />
           </div>
           <div className="qe-field">
             <label>Quantity</label>
@@ -149,12 +175,14 @@ const Purchase = () => {
               if (existingIndex >= 0) {
                 newItems[existingIndex].quantity += tempQty;
                 newItems[existingIndex].price = tempPrice; 
+                if (tempVariant) newItems[existingIndex].variant = tempVariant;
               } else {
-                newItems.push({ productId: finalId, name: finalName, quantity: tempQty, price: tempPrice });
+                newItems.push({ productId: finalId, name: finalName, variant: tempVariant, quantity: tempQty, price: tempPrice });
               }
               
               setItems(newItems);
               setTempProductId('');
+              setTempVariant('');
               setTempQty(1);
               setTempPrice(0);
             }}
@@ -169,6 +197,7 @@ const Purchase = () => {
             <thead>
               <tr>
                 <th>Product Name</th>
+                <th>Variant</th>
                 <th style={{ textAlign: 'center' }}>Qty</th>
                 <th style={{ textAlign: 'right' }}>Unit Price</th>
                 <th style={{ textAlign: 'right' }}>Total</th>
@@ -178,7 +207,7 @@ const Purchase = () => {
             <tbody>
               {items.filter(i => i.productId).length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="text-center text-muted" style={{ padding: '2rem' }}>
+                  <td colSpan="6" className="text-center text-muted" style={{ padding: '2rem' }}>
                     No items added yet. Use the row above to add products.
                   </td>
                 </tr>
@@ -186,6 +215,7 @@ const Purchase = () => {
                 items.filter(i => i.productId).map((item, index) => (
                   <tr key={index}>
                     <td className="font-bold text-main">{item.name}</td>
+                    <td>{item.variant || '-'}</td>
                     <td style={{ textAlign: 'center' }}>{item.quantity}</td>
                     <td style={{ textAlign: 'right' }}>৳{item.price.toLocaleString()}</td>
                     <td style={{ textAlign: 'right', fontWeight: 'bold' }} className="text-primary">
@@ -235,6 +265,24 @@ const Purchase = () => {
                   return;
                 }
                 
+                let finalPaidAmount = 0;
+                if (paymentType === 'Cash') {
+                  finalPaidAmount = total;
+                } else if (paymentType === 'Baki') {
+                  finalPaidAmount = 0;
+                } else {
+                  finalPaidAmount = parseFloat(paidAmount) || 0;
+                }
+
+                if (paymentType === 'Partial' && finalPaidAmount <= 0) {
+                  alert('Please enter a valid paid amount for partial payment.');
+                  return;
+                }
+                if (finalPaidAmount > total) {
+                   alert('Paid amount cannot exceed total amount.');
+                   return;
+                }
+                
                 const supplierObj = suppliers.find(s => s.name === supplier || s.id === supplier);
                 const finalSupplierId = supplierObj ? supplierObj.id : `SUP_CUSTOM_${Date.now()}`;
                 const finalSupplierName = supplierObj ? supplierObj.name : supplier;
@@ -245,12 +293,14 @@ const Purchase = () => {
                   paymentType,
                   items: validItems,
                   total,
+                  paidAmount: finalPaidAmount,
                   date: new Date().toISOString(),
                   id: 'PUR' + Date.now()
                 });
                 
                 alert('Purchase successfully recorded!');
                 setSupplier('');
+                setPaidAmount('');
                 setItems([]);
                 setActiveTab('History');
               }}
@@ -308,6 +358,8 @@ const Purchase = () => {
                 <th>Items Qty</th>
                 <th>Payment Type</th>
                 <th>Total Cost</th>
+                <th>Paid</th>
+                <th>Due</th>
                 <th style={{textAlign:'center'}}>Actions</th>
               </tr>
             </thead>
@@ -318,8 +370,10 @@ const Purchase = () => {
                   <td>{p.id}</td>
                   <td>{p.supplierName}</td>
                   <td>{p.items.reduce((acc, i) => acc + i.quantity, 0)} items</td>
-                  <td><span className={`badge ${p.paymentType === 'Cash' ? 'bg-success' : 'bg-warning'}`}>{p.paymentType}</span></td>
+                  <td><span className={`badge ${p.paymentType === 'Cash' ? 'bg-success' : p.paymentType === 'Partial' ? 'bg-info' : 'bg-warning'}`}>{p.paymentType}</span></td>
                   <td className="text-danger font-bold">৳{p.total.toLocaleString()}</td>
+                  <td className="text-success font-bold">৳{(p.paidAmount || 0).toLocaleString()}</td>
+                  <td className="text-warning font-bold">৳{(p.dueAmount || 0).toLocaleString()}</td>
                   <td style={{textAlign:'center'}}>
                     <div className="flex-align-gap" style={{justifyContent:'center'}}>
                       <button className="btn-icon" title="View & Print" onClick={() => setSelectedInvoice(p)}>
@@ -336,7 +390,7 @@ const Purchase = () => {
 
         <div style={{ display: 'none' }}>
           <div id="printable-all-purchases-details" style={{ padding: '2rem', background: '#fff', color: '#000' }}>
-            <h2 style={{ textAlign: 'center', fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+            <InvoiceHeader />
             <h3 style={{ textAlign: 'center', fontSize: '1.1rem', marginBottom: '1rem' }}>Detailed Purchase History</h3>
             {(startDate || endDate) && <p style={{textAlign: 'center', marginBottom: '1rem', fontSize: '0.9rem'}}>Date Filter: {startDate || 'Any'} to {endDate || 'Any'}</p>}
             
@@ -348,6 +402,7 @@ const Purchase = () => {
                   <th style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'left'}}>Supplier</th>
                   <th style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'left'}}>Payment</th>
                   <th style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'left'}}>Item</th>
+                  <th style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'left'}}>Variant</th>
                   <th style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'center'}}>Qty</th>
                   <th style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>Price</th>
                   <th style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>Total</th>
@@ -367,14 +422,19 @@ const Purchase = () => {
                            </>
                         )}
                         <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{item.name}</td>
+                        <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{item.variant || '-'}</td>
                         <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'center'}}>{item.quantity}</td>
                         <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>৳{item.price}</td>
                         <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>৳{item.price * item.quantity}</td>
                       </tr>
                     ))}
                     <tr style={{ background: '#f8f9fa' }}>
-                      <td colSpan="7" style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right', fontWeight: 'bold'}}>Invoice {purchase.id} Total:</td>
-                      <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right', fontWeight: 'bold'}}>৳{purchase.total}</td>
+                      <td colSpan="8" style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right', fontWeight: 'bold'}}>Invoice {purchase.id} Total:</td>
+                      <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right', fontWeight: 'bold'}}>
+                        ৳{purchase.total}<br/>
+                        <span style={{ fontSize: '0.8rem', color: '#16a34a' }}>Paid: ৳{purchase.paidAmount || 0}</span><br/>
+                        <span style={{ fontSize: '0.8rem', color: '#dc2626' }}>Due: ৳{purchase.dueAmount || 0}</span>
+                      </td>
                     </tr>
                   </React.Fragment>
                 ))}
@@ -402,7 +462,7 @@ const Purchase = () => {
             
             <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
               <div id="printable-single-invoice-pur" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
-                 <h2 style={{ textAlign: 'center', marginBottom: '0.5rem', color: '#000', fontSize: '1.5rem', fontWeight: 'bold' }}>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+                 <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
                    Purchase Receipt: {selectedInvoice.id}<br/>
                    Date: {new Date(selectedInvoice.date).toLocaleString()}
@@ -425,7 +485,7 @@ const Purchase = () => {
                       {selectedInvoice.items.map((item, idx) => (
                         <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
                           <td style={{ padding: '0.75rem 0' }}>
-                            {item.name} <br/> 
+                            {item.name} {item.variant && <span style={{ color: '#666', fontSize: '0.8rem' }}>({item.variant})</span>} <br/> 
                             <small style={{ color: '#666' }}>{item.quantity} x ৳{item.price}</small>
                           </td>
                           <td style={{textAlign: 'right', padding: '0.75rem 0'}}>
@@ -438,6 +498,14 @@ const Purchase = () => {
                  <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: '#000' }}>
                     <span>Total:</span>
                     <span>৳{selectedInvoice.total}</span>
+                 </div>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginTop: '0.2rem', color: '#000' }}>
+                    <span>Paid:</span>
+                    <span>৳{selectedInvoice.paidAmount || 0}</span>
+                 </div>
+                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', marginTop: '0.2rem', color: '#000' }}>
+                    <span>Due:</span>
+                    <span>৳{selectedInvoice.dueAmount || 0}</span>
                  </div>
               </div>
             </div>

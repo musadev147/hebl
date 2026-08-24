@@ -167,7 +167,7 @@ const useStore = create(
         };
       }),
 
-      processPurchase: ({ items, supplierId, supplierName, paymentType, total }) => set((state) => {
+      processPurchase: ({ items, supplierId, supplierName, paymentType, total, paidAmount }) => set((state) => {
         const newInventory = [...state.inventory];
         
         items.forEach(item => {
@@ -180,6 +180,7 @@ const useStore = create(
               id: 'P' + Date.now() + Math.floor(Math.random()*100),
               name: item.name,
               category: 'Uncategorized',
+              variant: item.variant || '',
               unit: 'Pcs',
               stock: item.quantity,
               price: item.price // Note: this is purchase price, not retail, but simplified here
@@ -187,11 +188,13 @@ const useStore = create(
           }
         });
 
+        const dueAmount = total - paidAmount;
         const newSuppliers = [...state.suppliers];
-        if (paymentType === 'Baki') {
+        
+        if (dueAmount > 0) {
           const supIndex = newSuppliers.findIndex(s => s.id === supplierId);
           if (supIndex !== -1) {
-            newSuppliers[supIndex] = { ...newSuppliers[supIndex], due: newSuppliers[supIndex].due + total };
+            newSuppliers[supIndex] = { ...newSuppliers[supIndex], due: newSuppliers[supIndex].due + dueAmount };
           }
         }
 
@@ -202,7 +205,9 @@ const useStore = create(
           supplierId,
           supplierName,
           paymentType,
-          total
+          total,
+          paidAmount,
+          dueAmount
         };
 
         return {

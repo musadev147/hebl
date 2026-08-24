@@ -4,6 +4,7 @@ import { Plus, X, PieChart, DollarSign, Printer, Eye, Download } from 'lucide-re
 
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
+import InvoiceHeader from '../components/InvoiceHeader';
 
 const EXPENSE_CATEGORIES = ['Shop Rent', 'Electricity Bill', 'Transport', 'Staff Cost', 'Others'];
 
@@ -128,8 +129,8 @@ const Expenses = () => {
 
       {/* Hidden Printable Expenses List (Excel Style) */}
       <div id="printable-expenses-list" style={{ display: 'none' }}>
-        <div style={{ padding: '1.5rem', background: '#fff', color: '#000', fontFamily: 'sans-serif' }}>
-          <h2 style={{ textAlign: 'center', fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+        <div style={{ padding: '2rem', background: '#fff', color: '#000' }}>
+          <InvoiceHeader />
           <p style={{ textAlign: 'center', fontSize: '1rem', marginBottom: '1.5rem', color: '#333' }}>
             Expense List
           </p>
@@ -318,7 +319,7 @@ const Expenses = () => {
             
             <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
               <div id="printable-single-expense" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
-                 <h2 style={{ textAlign: 'center', marginBottom: '0.5rem', color: '#000', fontSize: '1.5rem', fontWeight: 'bold' }}>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+                 <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
                    Expense Voucher<br/>
                    ID: {selectedExpense.id}<br/>

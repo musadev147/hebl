@@ -99,7 +99,7 @@ const Dashboard = () => {
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
         <div>
           <h1>Dashboard Overview</h1>
-          <p className="text-muted">Welcome to আল্লাহর দান জেন্টস পয়েন্ট System.</p>
+          <p className="text-muted">Welcome to EHBL System.</p>
         </div>
 
         <div className="card glass animate-fade-in" style={{

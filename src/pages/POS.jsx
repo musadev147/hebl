@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import useStore from '../store/useStore';
 import { Search, Plus, Minus, Trash2, Gift, Database, List, Printer, Eye, Download, FilePlus } from 'lucide-react';
 import { downloadAsPDF } from '../utils/pdfGenerator';
+import InvoiceHeader from '../components/InvoiceHeader';
 import './POS.css';
 
 const POS = () => {
@@ -311,7 +312,7 @@ const POS = () => {
             
             <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
               <div id="printable-invoice" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
-                 <h2 style={{ textAlign: 'center', marginBottom: '0.5rem', color: '#000', fontSize: '1.5rem', fontWeight: 'bold' }}>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+                 <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
                    Receipt: {completedSale.invoiceId}<br/>
                    Date: {new Date(completedSale.date).toLocaleString()}
@@ -460,7 +461,7 @@ const POS = () => {
         
         <div style={{ display: 'none' }}>
           <div id="printable-all-sales-details" style={{ padding: '2rem', background: '#fff', color: '#000' }}>
-            <h2 style={{ textAlign: 'center', fontSize: '1.5rem', marginBottom: '0.5rem', fontWeight: 'bold' }}>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+            <InvoiceHeader />
             <h3 style={{ textAlign: 'center', fontSize: '1.1rem', marginBottom: '1rem' }}>Detailed Sales History</h3>
             {(startDate || endDate) && <p style={{textAlign: 'center', marginBottom: '1rem', fontSize: '0.9rem'}}>Date Filter: {startDate || 'Any'} to {endDate || 'Any'}</p>}
             
@@ -526,7 +527,7 @@ const POS = () => {
             
             <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
               <div id="printable-single-invoice-pos" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
-                 <h2 style={{ textAlign: 'center', marginBottom: '0.5rem', color: '#000', fontSize: '1.5rem', fontWeight: 'bold' }}>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+                 <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
                    Sale Receipt: {selectedInvoice.id}<br/>
                    Date: {new Date(selectedInvoice.date).toLocaleString()}

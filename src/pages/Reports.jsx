@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { BarChart, PieChart, TrendingUp, DollarSign, Users, Package, Calendar, Printer, Database, ShoppingCart, Download, Eye, Plus, X, Gift } from 'lucide-react';
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
+import InvoiceHeader from '../components/InvoiceHeader';
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState('Sales');
@@ -583,7 +584,7 @@ const Reports = () => {
             
             <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
               <div id="printable-single-invoice" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
-                 <h2 style={{ textAlign: 'center', marginBottom: '0.5rem', color: '#000', fontSize: '1.5rem', fontWeight: 'bold' }}>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+                 <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
                    {invoiceType} Document<br/>
                    {selectedInvoice.date && `Date: ${new Date(selectedInvoice.date).toLocaleString()}`}

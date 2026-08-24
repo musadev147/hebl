@@ -20,6 +20,7 @@ import {
   WifiOff
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import InvoiceHeader from './InvoiceHeader';
 import './Layout.css';
 
 const Layout = () => {
@@ -70,9 +71,12 @@ const Layout = () => {
     <div className="app-container">
       <aside className="sidebar glass">
         <div className="sidebar-header">
-          <div>
-            <h2>আল্লাহর দান জেন্টস পয়েন্ট</h2>
-            <span className="role-badge">{user?.role}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img src="/src/assets/ehbl.jpeg" alt="EHBL Logo" style={{ height: '45px', width: '45px', borderRadius: '8px', objectFit: 'contain', background: 'white' }} />
+            <div>
+              <h2>EHBL</h2>
+              <span className="role-badge">{user?.role}</span>
+            </div>
           </div>
           <button 
             className="mobile-menu-toggle btn-icon" 
@@ -122,7 +126,7 @@ const Layout = () => {
         </header>
         <div className="content-area">
           <div className="print-only-header">
-            <h2>আল্লাহর দান জেন্টস পয়েন্ট</h2>
+            <InvoiceHeader />
           </div>
           <Outlet />
         </div>

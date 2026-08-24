@@ -21,9 +21,9 @@ const Login = () => {
   return (
     <div className="login-container">
       <div className="login-card card animate-fade-in">
-        <div className="login-header">
-          <h2>আল্লাহর দান জেন্টস পয়েন্ট</h2>
-          <p>Login to your account</p>
+        <div className="login-header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingBottom: '1rem' }}>
+          <img src="/src/assets/ehbl.jpeg" alt="EHBL Logo" style={{ height: '100px', width: 'auto', objectFit: 'contain', marginBottom: '15px' }} />
+          <p style={{ margin: 0, color: '#64748b', fontSize: '1.1rem' }}>Login to your account</p>
         </div>
         <form onSubmit={handleLogin} className="login-form">
           <div className="input-group">
