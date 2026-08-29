@@ -1,14 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import useStore from '../store/useStore';
 import { Search, Plus, Minus, Trash2, Gift, Database, List, Printer, Eye, Download, FilePlus } from 'lucide-react';
 import { downloadAsPDF } from '../utils/pdfGenerator';
 import InvoiceHeader from '../components/InvoiceHeader';
+import PrintableInvoice from '../components/PrintableInvoice';
+import PrintFooter from '../components/PrintFooter';
 import './POS.css';
 
 const POS = () => {
-  const { cart, inventory, staff, user, addToCart, removeFromCart, updateCartItem, clearCart, loadDummyData, processSale, sales } = useStore();
+  const { cart, inventory, staff, user, customers, addToCart, removeFromCart, updateCartItem, clearCart, loadDummyData, processSale, sales } = useStore();
   const [activeTab, setActiveTab] = useState('New'); // 'New' or 'History'
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'add') {
+      setActiveTab('New');
+    } else {
+      setActiveTab('History');
+    }
+  }, [location.search]);
+
   const [barcodeInput, setBarcodeInput] = useState('');
   const [customerInfo, setCustomerInfo] = useState({ name: '', phone: '', location: '' });
   const [paymentType, setPaymentType] = useState('Cash');
@@ -303,68 +319,16 @@ const POS = () => {
       {completedSale && createPortal(
         <div className="drawer-overlay">
           <div className="drawer-container">
-            <div className="drawer-header" style={{ backgroundColor: '#f1f5f9' }}>
+            <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Sale Receipt</h3>
               <button className="drawer-close-btn" onClick={() => setCompletedSale(null)}>
                 <Plus size={24} style={{ transform: 'rotate(45deg)' }} />
               </button>
             </div>
             
-            <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
-              <div id="printable-invoice" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
-                 <InvoiceHeader />
-                 <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
-                   Receipt: {completedSale.invoiceId}<br/>
-                   Date: {new Date(completedSale.date).toLocaleString()}
-                 </p>
-                 <hr style={{ margin: '1rem 0', borderColor: '#eee' }} />
-                 
-                 {completedSale.customerInfo.name && (
-                   <div style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: '#333' }}>
-                     <strong>Customer:</strong> {completedSale.customerInfo.name}<br/>
-                     {completedSale.customerInfo.phone && <><br/><strong>Phone:</strong> {completedSale.customerInfo.phone}</>}
-                     {completedSale.customerInfo.location && <><br/><strong>Location:</strong> {completedSale.customerInfo.location}</>}
-                   </div>
-                 )}
-
-                 <table style={{ width: '100%', fontSize: '0.85rem', marginBottom: '1.5rem', color: '#000', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid #eee' }}>
-                        <th style={{textAlign: 'left', paddingBottom: '0.5rem'}}>Item</th>
-                        <th style={{textAlign: 'right', paddingBottom: '0.5rem'}}>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {completedSale.cartItems.map((item, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
-                          <td style={{ padding: '0.75rem 0' }}>
-                            {item.name} {item.isGift && '(Gift)'} <br/> 
-                            <small style={{ color: '#666' }}>{item.quantity} x ৳{item.price} {item.itemDiscount > 0 ? `(-৳${item.itemDiscount})` : ''}</small>
-                          </td>
-                          <td style={{textAlign: 'right', padding: '0.75rem 0'}}>
-                            ৳{item.isGift ? 0 : (item.price - (item.itemDiscount || 0)) * item.quantity}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                 </table>
-                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#333', marginTop: '0.5rem' }}>
-                    <span>Subtotal:</span>
-                    <span>৳{completedSale.subtotal}</span>
-                 </div>
-                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#333' }}>
-                    <span>Discount:</span>
-                    <span>৳{completedSale.invoiceDiscount}</span>
-                 </div>
-                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: '#000' }}>
-                    <span>Total Payable:</span>
-                    <span>৳{completedSale.total}</span>
-                 </div>
-                 <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: '0.9rem', color: '#555' }}>
-                    <p style={{ marginBottom: '0.2rem' }}>Payment: {completedSale.paymentType}</p>
-                    <p style={{ marginBottom: '0.5rem' }}>Salesman: {completedSale.salesman?.name}</p>
-                    <p>Thank you for shopping with us!</p>
-                 </div>
+            <div className="drawer-body" style={{ padding: '0' }}>
+              <div id="printable-invoice">
+                <PrintableInvoice sale={completedSale} customers={customers} />
               </div>
             </div>
 
@@ -509,6 +473,7 @@ const POS = () => {
             <div style={{ textAlign: 'right', marginTop: '1.5rem', fontSize: '1.2rem', fontWeight: 'bold' }}>
               Grand Total: ৳{filteredSales.reduce((acc, s) => acc + s.total, 0)}
             </div>
+            <PrintFooter />
           </div>
         </div>
       </div>
@@ -518,52 +483,16 @@ const POS = () => {
       {selectedInvoice && createPortal(
         <div className="drawer-overlay">
           <div className="drawer-container">
-            <div className="drawer-header" style={{ backgroundColor: '#f1f5f9' }}>
+            <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Sale Receipt</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedInvoice(null)}>
                 <Plus size={24} style={{ transform: 'rotate(45deg)' }} />
               </button>
             </div>
             
-            <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
-              <div id="printable-single-invoice-pos" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
-                 <InvoiceHeader />
-                 <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
-                   Sale Receipt: {selectedInvoice.id}<br/>
-                   Date: {new Date(selectedInvoice.date).toLocaleString()}
-                 </p>
-                 <hr style={{ margin: '1rem 0', borderColor: '#eee' }} />
-                 
-                 <div style={{ fontSize: '0.9rem', marginBottom: '1.5rem', color: '#333' }}>
-                   {selectedInvoice.customerName && <><strong>Customer:</strong> {selectedInvoice.customerName}<br/></>}
-                   <strong>Payment:</strong> {selectedInvoice.paymentType}
-                 </div>
-
-                 <table style={{ width: '100%', fontSize: '0.85rem', marginBottom: '1.5rem', color: '#000', borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid #eee' }}>
-                        <th style={{textAlign: 'left', paddingBottom: '0.5rem'}}>Item</th>
-                        <th style={{textAlign: 'right', paddingBottom: '0.5rem'}}>Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selectedInvoice.items.map((item, idx) => (
-                        <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
-                          <td style={{ padding: '0.75rem 0' }}>
-                            {item.name} <br/> 
-                            <small style={{ color: '#666' }}>{item.quantity} x ৳{item.price}</small>
-                          </td>
-                          <td style={{textAlign: 'right', padding: '0.75rem 0'}}>
-                            ৳{item.price * item.quantity}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                 </table>
-                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: '#000' }}>
-                    <span>Total:</span>
-                    <span>৳{selectedInvoice.total}</span>
-                 </div>
+            <div className="drawer-body" style={{ padding: '0' }}>
+              <div id="printable-single-invoice-pos">
+                <PrintableInvoice sale={selectedInvoice} customers={customers} />
               </div>
             </div>
 

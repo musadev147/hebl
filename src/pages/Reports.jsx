@@ -4,6 +4,7 @@ import { BarChart, PieChart, TrendingUp, DollarSign, Users, Package, Calendar, P
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
 import InvoiceHeader from '../components/InvoiceHeader';
+import PrintFooter from '../components/PrintFooter';
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState('Sales');
@@ -575,14 +576,14 @@ const Reports = () => {
       {selectedInvoice && createPortal(
         <div className="drawer-overlay">
           <div className="drawer-container">
-            <div className="drawer-header" style={{ backgroundColor: '#f1f5f9' }}>
+            <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Document Print</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedInvoice(null)}>
                 <Plus size={24} style={{ transform: 'rotate(45deg)' }} />
               </button>
             </div>
             
-            <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
+            <div className="drawer-body" style={{ padding: '0' }}>
               <div id="printable-single-invoice" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
                  <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
@@ -690,6 +691,7 @@ const Reports = () => {
                      <p style={{ fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: 'red' }}><strong>Total Expense:</strong> ৳{selectedInvoice.amount.toLocaleString()}</p>
                    </div>
                  )}
+                 <PrintFooter />
               </div>
             </div>
 
@@ -712,7 +714,7 @@ const Reports = () => {
         </div>,
         document.body
       )}
-
+      <PrintFooter />
     </div>
   );
 };

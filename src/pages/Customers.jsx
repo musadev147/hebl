@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, MessageSquare, Phone, Printer, Eye, Download } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Search, MessageSquare, Phone, Printer, Eye, Download, Plus } from 'lucide-react';
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
 import InvoiceHeader from '../components/InvoiceHeader';
+import PrintFooter from '../components/PrintFooter';
 
 const Customers = () => {
   const { customers, suppliers, settleCustomerDue, settleSupplierDue, sales, purchases, settlements } = useStore();
@@ -12,6 +14,24 @@ const Customers = () => {
   const [smsModal, setSmsModal] = useState({ show: false, target: null, message: '' });
   const [settleModal, setSettleModal] = useState({ show: false, target: null, amount: '', date: '' });
   const [selectedPerson, setSelectedPerson] = useState(null);
+
+  // Add Customer Modal State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newCustomer, setNewCustomer] = useState({ name: '', phone: '', location: '', due: '', notes: '' });
+  const { addCustomer } = useStore();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'add') {
+      setShowAddModal(true);
+    } else {
+      setShowAddModal(false);
+    }
+  }, [location.search]);
+
 
   // Compute Ledger for selected person
   let personLedger = [];
@@ -69,6 +89,24 @@ const Customers = () => {
     setSmsModal({ show: false, target: null, message: '' });
   };
 
+  const handleAddCustomer = (e) => {
+    e.preventDefault();
+    if (!newCustomer.name) {
+      alert("Name is required");
+      return;
+    }
+    const customerToSave = { ...newCustomer };
+    if (customerToSave.due) {
+      customerToSave.due = parseFloat(customerToSave.due) || 0;
+    } else {
+      customerToSave.due = 0;
+    }
+    addCustomer(customerToSave);
+    setNewCustomer({ name: '', phone: '', location: '', due: '', notes: '' });
+    setShowAddModal(false);
+  };
+
+
   const handleSettle = (e) => {
     e.preventDefault();
     const amount = parseFloat(settleModal.amount);
@@ -122,7 +160,10 @@ const Customers = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="btn-primary flex-align-gap" onClick={() => {
+          <button className="btn-primary flex-align-gap" onClick={() => setShowAddModal(true)} style={{marginLeft: 'auto'}}>
+            <Plus size={16} /> New Customer
+          </button>
+          <button className="btn-outline flex-align-gap" onClick={() => {
             const printContents = document.getElementById('printable-customers-list').innerHTML;
             const originalContents = document.body.innerHTML;
             document.body.innerHTML = '<div id="print-wrapper">' + printContents + '</div>';
@@ -222,6 +263,7 @@ const Customers = () => {
               </tr>
             </tfoot>
           </table>
+          <PrintFooter />
         </div>
       </div>
 
@@ -317,14 +359,14 @@ const Customers = () => {
       {selectedPerson && createPortal(
         <div className="drawer-overlay">
           <div className="drawer-container">
-            <div className="drawer-header" style={{ backgroundColor: '#f1f5f9' }}>
+            <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Due Statement</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedPerson(null)}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
             
-            <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
+            <div className="drawer-body" style={{ padding: '0' }}>
               <div id="printable-single-person" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
                  <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
@@ -378,6 +420,7 @@ const Customers = () => {
                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
                    <p style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'red' }}><strong>Current Due:</strong> ৳{selectedPerson.due.toLocaleString()}</p>
                  </div>
+                 <PrintFooter />
               </div>
             </div>
 
@@ -400,6 +443,81 @@ const Customers = () => {
         </div>,
         document.body
       )}
+
+      {/* Add Customer Drawer */}
+      {showAddModal && createPortal(
+        <div className="drawer-overlay">
+          <div className="drawer-container">
+            <div className="drawer-header">
+              <h2>Add New Customer</h2>
+              <button type="button" className="drawer-close-btn" onClick={() => setShowAddModal(false)}>
+                <Plus size={24} style={{ transform: 'rotate(45deg)' }} />
+              </button>
+            </div>
+            <div className="drawer-body">
+              <form id="add-customer-form" onSubmit={handleAddCustomer} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div>
+                  <label className="text-muted" style={{ display: 'block', marginBottom: '0.5rem' }}>Customer Name *</label>
+                  <input 
+                    type="text" 
+                    value={newCustomer.name} 
+                    onChange={e => setNewCustomer({...newCustomer, name: e.target.value})} 
+                    placeholder="e.g. Karim Rahman" 
+                    required 
+                    style={{ width: '100%' }}
+                  />
+                </div>
+                <div>
+                  <label className="text-muted" style={{ display: 'block', marginBottom: '0.5rem' }}>Phone Number</label>
+                  <input 
+                    type="text" 
+                    value={newCustomer.phone} 
+                    onChange={e => setNewCustomer({...newCustomer, phone: e.target.value})} 
+                    placeholder="e.g. 01712345678" 
+                    style={{ width: '100%' }}
+                  />
+                </div>
+                <div>
+                  <label className="text-muted" style={{ display: 'block', marginBottom: '0.5rem' }}>Location / Address</label>
+                  <input 
+                    type="text" 
+                    value={newCustomer.location} 
+                    onChange={e => setNewCustomer({...newCustomer, location: e.target.value})} 
+                    placeholder="e.g. Dhaka" 
+                    style={{ width: '100%' }}
+                  />
+                </div>
+                <div>
+                  <label className="text-muted" style={{ display: 'block', marginBottom: '0.5rem' }}>Opening Balance (Due)</label>
+                  <input 
+                    type="number" 
+                    value={newCustomer.due} 
+                    onChange={e => setNewCustomer({...newCustomer, due: e.target.value})} 
+                    placeholder="e.g. 5000" 
+                    style={{ width: '100%' }}
+                  />
+                </div>
+                <div>
+                  <label className="text-muted" style={{ display: 'block', marginBottom: '0.5rem' }}>Notes / Remarks</label>
+                  <textarea 
+                    value={newCustomer.notes} 
+                    onChange={e => setNewCustomer({...newCustomer, notes: e.target.value})} 
+                    placeholder="Any additional information..." 
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                    rows={2}
+                  />
+                </div>
+              </form>
+            </div>
+            <div className="drawer-footer">
+              <button type="button" className="btn-outline" onClick={() => setShowAddModal(false)}>Cancel</button>
+              <button type="submit" form="add-customer-form" className="btn-primary">Add Customer</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
     </div>
   );
 };

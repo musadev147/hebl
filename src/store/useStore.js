@@ -7,7 +7,9 @@ const useStore = create(
       // App State
       user: null, // { id, name, role: 'Admin' | 'Salesman' }
       theme: 'dark',
+      activeThemeClass: 'theme-default',
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
+      setThemeClass: (className) => set({ activeThemeClass: className }),
       login: (userData) => set({ user: userData }),
       logout: () => set({ user: null }),
 
@@ -42,6 +44,13 @@ const useStore = create(
       attendance: [], // { id, date, staffId, status: 'Present' | 'Absent' | 'Late' | 'Leave' }
       leaves: [],     // { id, date, staffId, type: 'Casual' | 'Sick', reason, status: 'Pending' | 'Approved' | 'Rejected' }
       payrolls: [],   // { id, month, year, staffId, presentDays, baseSalary, bonus, netPay, paymentDate }
+
+      // SMS History
+      smsHistory: [],
+      addSmsToHistory: (smsData) => set((state) => ({
+        smsHistory: [{ id: 'SMS' + Date.now(), date: new Date().toISOString(), ...smsData }, ...state.smsHistory]
+      })),
+
 
       // Cart State (Temporary, not persisted to DB logically but kept in Zustand)
       cart: [],
@@ -256,6 +265,10 @@ const useStore = create(
 
       addSupplier: (supplierData) => set((state) => ({
         suppliers: [...state.suppliers, { id: 'SUP' + Date.now(), due: 0, ...supplierData }]
+      })),
+
+      addCustomer: (customerData) => set((state) => ({
+        customers: [...state.customers, { id: 'C' + Date.now(), due: 0, ...customerData }]
       })),
 
       updateSupplier: (supplierId, updates) => set((state) => ({

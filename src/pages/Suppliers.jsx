@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, Printer, Eye, Download, Plus, Phone } from 'lucide-react';
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
 import InvoiceHeader from '../components/InvoiceHeader';
+import PrintFooter from '../components/PrintFooter';
 
 const Suppliers = () => {
   const { suppliers, addSupplier, purchases, settlements } = useStore();
@@ -41,6 +43,19 @@ const Suppliers = () => {
   // Add Supplier Modal State
   const [showAddModal, setShowAddModal] = useState(false);
   const [newSupplier, setNewSupplier] = useState({ name: '', company: '', phone: '', email: '', location: '', due: '', notes: '' });
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'add') {
+      setShowAddModal(true);
+    } else {
+      setShowAddModal(false);
+    }
+  }, [location.search]);
+
 
   const filteredList = suppliers.filter(
     (person) =>
@@ -141,6 +156,7 @@ const Suppliers = () => {
           </table>
         </div>
       </div>
+      <PrintFooter />
 
       {/* Add Supplier Drawer */}
       {showAddModal && createPortal(
@@ -240,14 +256,14 @@ const Suppliers = () => {
       {selectedPerson && createPortal(
         <div className="drawer-overlay">
           <div className="drawer-container">
-            <div className="drawer-header" style={{ backgroundColor: '#f1f5f9' }}>
+            <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Supplier Statement</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedPerson(null)}>
                 <Plus size={24} style={{ transform: 'rotate(45deg)' }} />
               </button>
             </div>
             
-            <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
+            <div className="drawer-body" style={{ padding: '0' }}>
               <div id="printable-single-person" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
                  <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
@@ -302,6 +318,7 @@ const Suppliers = () => {
                      </div>
                    )}
                  </div>
+                 <PrintFooter />
               </div>
             </div>
 

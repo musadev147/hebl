@@ -13,7 +13,7 @@ const InvoiceHeader = () => {
         <h2 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 'bold', fontFamily: 'serif' }}>EHBL AND POWER TOOLS SUPPLIERS.</h2>
       </div>
       <p style={{ margin: '0.3rem 0', fontSize: '0.95rem', fontWeight: 'bold' }}>
-        Hardware: Hand Tools, Machine Tools, Sanitary, Building, Chemical Materials Manufacturer, Importer & Suppliers.
+        Indian lock, China lock, Hardware: Hand Tools, Machine Tools, Sanitary, Building, Furniture Item Manufacturer, Importer & Suppliers.
       </p>
       <p style={{ margin: '0.2rem 0', fontSize: '0.85rem' }}>
         Corporate Office : House # 37. (1st Floor) Road # 1/A, Block # J, Gulshan - 02, Baridhara R/A, Dhaka -1212.

@@ -1,14 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Plus, Minus, Search, Trash2, Database, List, Printer, FilePlus, Eye, Download, FileText } from 'lucide-react';
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
 import InvoiceHeader from '../components/InvoiceHeader';
+import PrintFooter from '../components/PrintFooter';
 import './Purchase.css';
 
 const Purchase = () => {
   const { suppliers, inventory, purchases, processPurchase } = useStore();
   const [activeTab, setActiveTab] = useState('New'); // 'New' or 'History'
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'add') {
+      setActiveTab('New');
+    } else {
+      setActiveTab('History');
+    }
+  }, [location.search]);
+
   
   const [supplier, setSupplier] = useState('');
   const [paymentType, setPaymentType] = useState('Cash');
@@ -444,6 +459,7 @@ const Purchase = () => {
             <div style={{ textAlign: 'right', marginTop: '1.5rem', fontSize: '1.2rem', fontWeight: 'bold' }}>
               Grand Total: ৳{filteredPurchases.reduce((acc, p) => acc + p.total, 0)}
             </div>
+            <PrintFooter />
           </div>
         </div>
       </div>
@@ -453,14 +469,14 @@ const Purchase = () => {
       {selectedInvoice && createPortal(
         <div className="drawer-overlay">
           <div className="drawer-container">
-            <div className="drawer-header" style={{ backgroundColor: '#f1f5f9' }}>
+            <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Purchase Receipt</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedInvoice(null)}>
                 <Plus size={24} style={{ transform: 'rotate(45deg)' }} />
               </button>
             </div>
             
-            <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
+            <div className="drawer-body" style={{ padding: '0' }}>
               <div id="printable-single-invoice-pur" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
                  <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
@@ -507,6 +523,7 @@ const Purchase = () => {
                     <span>Due:</span>
                     <span>৳{selectedInvoice.dueAmount || 0}</span>
                  </div>
+                 <PrintFooter />
               </div>
             </div>
 

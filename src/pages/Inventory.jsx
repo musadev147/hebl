@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Barcode from 'react-barcode';
 import { Plus, Search, Printer, Edit, Trash2, Download } from 'lucide-react';
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
 import InvoiceHeader from '../components/InvoiceHeader';
+import PrintFooter from '../components/PrintFooter';
 import './Inventory.css';
 
 const Inventory = () => {
@@ -20,6 +22,18 @@ const Inventory = () => {
   const [newProduct, setNewProduct] = useState({
     id: '', name: '', category: 'Grocery', unit: 'Bag', variant: '', stock: 0, price: 0
   });
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'add') {
+      setShowAddModal(true);
+    } else {
+      setShowAddModal(false);
+    }
+  }, [location.search]);
 
   const handleAddProduct = (e) => {
     e.preventDefault();
@@ -248,6 +262,7 @@ const Inventory = () => {
               </tr>
             </tfoot>
           </table>
+          <PrintFooter />
         </div>
       </div>
 
@@ -289,6 +304,7 @@ const Inventory = () => {
                     </div>
                   ))}
                 </div>
+                <PrintFooter />
               </div>
             </div>
             <div className="drawer-footer" style={{ justifyContent: 'center', gap: '1rem' }}>

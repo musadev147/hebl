@@ -41,6 +41,21 @@ export const downloadAsPDF = (elementId, filename) => {
           .text-right { text-align: right; }
           .font-bold { font-weight: bold; }
           @page { size: A4 portrait; margin: 15mm; }
+          body { padding-bottom: 120px; }
+          .common-print-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 10px 15px;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #000;
+            box-sizing: border-box;
+          }
+          .common-print-footer p { margin: 0 0 3px 0; }
+          .common-print-footer .footer-phone { font-weight: bold; margin-top: 5px; }
         </style>
       </head>
       <body>

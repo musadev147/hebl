@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Users, Calendar, DollarSign, Award, Plus, Check, X, Eye, Printer, Download } from 'lucide-react';
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
 import InvoiceHeader from '../components/InvoiceHeader';
+import PrintFooter from '../components/PrintFooter';
 
 const HR = () => {
   const [activeTab, setActiveTab] = useState('Staff');
@@ -12,6 +14,28 @@ const HR = () => {
   // Modals state
   const [showAddStaffModal, setShowAddStaffModal] = useState(false);
   const [newStaff, setNewStaff] = useState({ name: '', role: 'Salesman', baseSalary: '', phone: '', address: '', bankAccount: '', username: '', password: '' });
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const action = searchParams.get('action');
+    if (action === 'add') {
+      setActiveTab('Staff');
+      setShowAddStaffModal(true);
+    } else if (action === 'attendance') {
+      setActiveTab('Attendance');
+    } else if (action === 'leave') {
+      setActiveTab('Leave');
+    } else if (action === 'payroll') {
+      setActiveTab('Payroll');
+    } else if (action === 'list' || !action) {
+      setActiveTab('Staff');
+      setShowAddStaffModal(false);
+    }
+  }, [location.search]);
+
 
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [newLeave, setNewLeave] = useState({ staffId: '', type: 'Casual', reason: '', date: new Date().toISOString().split('T')[0] });
@@ -440,14 +464,14 @@ const HR = () => {
         <div className="drawer-overlay">
           <div className="drawer-container">
             
-            <div className="drawer-header" style={{ borderBottom: 'none', backgroundColor: '#f1f5f9' }}>
+            <div className="drawer-header" style={{ borderBottom: 'none' }}>
               <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Staff Profile Document</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedStaff(null)}>
                 <X size={24} />
               </button>
             </div>
 
-            <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
+            <div className="drawer-body" style={{ padding: '0' }}>
               <div id="printable-single-staff" style={{ padding: '1.5rem', color: '#1e293b' }}>
                 {/* Header */}
                 <div style={{ textAlign: 'center', borderBottom: '3px solid #e2e8f0', paddingBottom: '1.5rem', marginBottom: '2.5rem' }}>
@@ -502,6 +526,7 @@ const HR = () => {
                 <div style={{ textAlign: 'center', marginTop: '3rem', color: '#94a3b8', fontSize: '0.85rem' }}>
                   Document Generated on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
                 </div>
+                <PrintFooter />
               </div>
             </div>
 

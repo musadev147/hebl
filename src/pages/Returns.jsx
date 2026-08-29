@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { RefreshCcw, Search, PackageMinus, PackagePlus, List, Plus, Printer, Eye, Download } from 'lucide-react';
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
 import InvoiceHeader from '../components/InvoiceHeader';
+import PrintFooter from '../components/PrintFooter';
 import './Returns.css';
 
 const Returns = () => {
   const { inventory, processReturn, returns } = useStore();
   const [activeTab, setActiveTab] = useState('New'); // 'New' or 'History'
   
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'add') {
+      setActiveTab('New');
+    } else {
+      setActiveTab('History');
+    }
+  }, [location.search]);
+
   // New Return State
   const [returnType, setReturnType] = useState('Customer');
   const [entryDate, setEntryDate] = useState(new Date().toISOString().split('T')[0]);
@@ -263,6 +277,7 @@ const Returns = () => {
                   ))}
                 </tbody>
               </table>
+              <PrintFooter />
             </div>
           </div>
         </div>
@@ -272,14 +287,14 @@ const Returns = () => {
       {selectedInvoice && createPortal(
         <div className="drawer-overlay">
           <div className="drawer-container">
-            <div className="drawer-header" style={{ backgroundColor: '#f1f5f9' }}>
+            <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Return Receipt</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedInvoice(null)}>
                 <Plus size={24} style={{ transform: 'rotate(45deg)' }} />
               </button>
             </div>
             
-            <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
+            <div className="drawer-body" style={{ padding: '0' }}>
               <div id="printable-single-return" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
                  <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
@@ -303,6 +318,7 @@ const Returns = () => {
                  <p style={{ textAlign: 'center', fontSize: '0.9rem', color: '#666', marginTop: '1.5rem' }}>
                    Thank you!
                  </p>
+                 <PrintFooter />
               </div>
             </div>
 

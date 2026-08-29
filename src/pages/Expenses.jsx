@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Plus, X, PieChart, DollarSign, Printer, Eye, Download } from 'lucide-react';
 
 import useStore from '../store/useStore';
 import { downloadAsPDF } from '../utils/pdfGenerator';
 import InvoiceHeader from '../components/InvoiceHeader';
+import PrintFooter from '../components/PrintFooter';
 
 const EXPENSE_CATEGORIES = ['Shop Rent', 'Electricity Bill', 'Transport', 'Staff Cost', 'Others'];
 
@@ -12,6 +14,19 @@ const Expenses = () => {
   const { expenses, addExpense } = useStore();
   const [showModal, setShowModal] = useState(false);
   const todayStr = new Date().toISOString().split('T')[0];
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('action') === 'add') {
+      setShowModal(true);
+    } else {
+      setShowModal(false);
+    }
+  }, [location.search]);
+
   const [newExpense, setNewExpense] = useState({ date: todayStr, category: EXPENSE_CATEGORIES[0], amount: '', description: '' });
   const [selectedExpense, setSelectedExpense] = useState(null);
 
@@ -167,6 +182,7 @@ const Expenses = () => {
               </tr>
             </tfoot>
           </table>
+          <PrintFooter />
         </div>
       </div>
 
@@ -283,6 +299,7 @@ const Expenses = () => {
                     </tbody>
                   </table>
                 </div>
+                <PrintFooter />
               </div>
             </div>
             
@@ -310,14 +327,14 @@ const Expenses = () => {
       {selectedExpense && createPortal(
         <div className="drawer-overlay">
           <div className="drawer-container">
-            <div className="drawer-header" style={{ backgroundColor: '#f1f5f9' }}>
+            <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Expense Voucher</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedExpense(null)}>
                 <X size={24} />
               </button>
             </div>
             
-            <div className="drawer-body" style={{ padding: '0', backgroundColor: '#fff' }}>
+            <div className="drawer-body" style={{ padding: '0' }}>
               <div id="printable-single-expense" style={{ padding: '1.5rem', background: '#fff', color: '#000' }}>
                  <InvoiceHeader />
                  <p style={{ textAlign: 'center', fontSize: '0.85rem', marginBottom: '1rem', color: '#555' }}>
@@ -333,6 +350,7 @@ const Expenses = () => {
                    <hr style={{ margin: '1rem 0', borderColor: '#eee' }} />
                    <p style={{ fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: 'red' }}><strong>Amount:</strong> ৳{selectedExpense.amount.toLocaleString()}</p>
                  </div>
+                 <PrintFooter />
               </div>
             </div>
 

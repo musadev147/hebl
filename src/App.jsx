@@ -15,6 +15,7 @@ import Settings from './pages/Settings';
 import Dashboard from './pages/Dashboard';
 import POS from './pages/POS';
 import SMS from './pages/SMS';
+import BillInvoice from './pages/BillInvoice';
 
 // Placeholder Pages (will be extracted to separate files in later phases)
 
@@ -35,14 +36,25 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
 function App() {
   const theme = useStore((state) => state.theme);
+  const activeThemeClass = useStore((state) => state.activeThemeClass);
 
   useEffect(() => {
+    // Clear previous theme classes
+    const themeClasses = ['theme-default', 'theme-ocean', 'theme-sunset', 'theme-forest', 'theme-berry', 'theme-midnight', 'theme-aurora', 'theme-rose', 'theme-lavender', 'theme-cyberpunk'];
+    document.body.classList.remove(...themeClasses);
+    
+    // Apply new theme class
+    if (activeThemeClass) {
+      document.body.classList.add(activeThemeClass);
+    }
+    
+    // Apply light/dark mode
     if (theme === 'light') {
       document.body.classList.add('light-mode');
     } else {
       document.body.classList.remove('light-mode');
     }
-  }, [theme]);
+  }, [theme, activeThemeClass]);
 
   return (
     <Router>
@@ -60,6 +72,7 @@ function App() {
           <Route path="/customers" element={<Customers />} />
           <Route path="/sms" element={<SMS />} />
           <Route path="/expenses" element={<Expenses />} />
+          <Route path="/invoice" element={<BillInvoice />} />
           
           {/* Admin Only Routes */}
           <Route path="hr" element={<ProtectedRoute requiredRole="Admin"><HR /></ProtectedRoute>} />

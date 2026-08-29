@@ -69,6 +69,106 @@ body:not(.light-mode) {
   --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.5);
 }
 
+/* Gradient Themes */
+body.theme-ocean {
+  --primary: #0284c7; --primary-hover: #0369a1; --secondary: #0d9488; --secondary-hover: #0f766e;
+  --bg-hover: rgba(2, 132, 199, 0.1); --shadow-glow: 0 0 20px rgba(2, 132, 199, 0.4);
+}
+body.theme-ocean.light-mode {
+  --bg-ambient: radial-gradient(circle at 0% 0%, #e0f2fe 0%, transparent 40%), radial-gradient(circle at 100% 100%, #ccfbf1 0%, transparent 40%), radial-gradient(circle at 50% 50%, #bae6fd 0%, transparent 50%);
+}
+body.theme-ocean:not(.light-mode) {
+  --bg-ambient: radial-gradient(circle at 0% 0%, rgba(2, 132, 199, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(13, 148, 136, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(2, 132, 199, 0.05) 0%, transparent 60%);
+}
+
+body.theme-sunset {
+  --primary: #ea580c; --primary-hover: #c2410c; --secondary: #e11d48; --secondary-hover: #be123c;
+  --bg-hover: rgba(234, 88, 12, 0.1); --shadow-glow: 0 0 20px rgba(234, 88, 12, 0.4);
+}
+body.theme-sunset.light-mode {
+  --bg-ambient: radial-gradient(circle at 0% 0%, #ffedd5 0%, transparent 40%), radial-gradient(circle at 100% 100%, #ffe4e6 0%, transparent 40%), radial-gradient(circle at 50% 50%, #ffedd5 0%, transparent 50%);
+}
+body.theme-sunset:not(.light-mode) {
+  --bg-ambient: radial-gradient(circle at 0% 0%, rgba(234, 88, 12, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(225, 29, 72, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(234, 88, 12, 0.05) 0%, transparent 60%);
+}
+
+body.theme-forest {
+  --primary: #16a34a; --primary-hover: #15803d; --secondary: #059669; --secondary-hover: #047857;
+  --bg-hover: rgba(22, 163, 74, 0.1); --shadow-glow: 0 0 20px rgba(22, 163, 74, 0.4);
+}
+body.theme-forest.light-mode {
+  --bg-ambient: radial-gradient(circle at 0% 0%, #dcfce7 0%, transparent 40%), radial-gradient(circle at 100% 100%, #d1fae5 0%, transparent 40%), radial-gradient(circle at 50% 50%, #bbf7d0 0%, transparent 50%);
+}
+body.theme-forest:not(.light-mode) {
+  --bg-ambient: radial-gradient(circle at 0% 0%, rgba(22, 163, 74, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(5, 150, 105, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(22, 163, 74, 0.05) 0%, transparent 60%);
+}
+
+body.theme-berry {
+  --primary: #9333ea; --primary-hover: #7e22ce; --secondary: #db2777; --secondary-hover: #be185d;
+  --bg-hover: rgba(147, 51, 234, 0.1); --shadow-glow: 0 0 20px rgba(147, 51, 234, 0.4);
+}
+body.theme-berry.light-mode {
+  --bg-ambient: radial-gradient(circle at 0% 0%, #f3e8ff 0%, transparent 40%), radial-gradient(circle at 100% 100%, #fce7f3 0%, transparent 40%), radial-gradient(circle at 50% 50%, #e9d5ff 0%, transparent 50%);
+}
+body.theme-berry:not(.light-mode) {
+  --bg-ambient: radial-gradient(circle at 0% 0%, rgba(147, 51, 234, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(219, 39, 119, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.05) 0%, transparent 60%);
+}
+
+body.theme-midnight {
+  --primary: #4f46e5; --primary-hover: #4338ca; --secondary: #7c3aed; --secondary-hover: #6d28d9;
+  --bg-hover: rgba(79, 70, 229, 0.1); --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.4);
+}
+body.theme-midnight.light-mode {
+  --bg-ambient: radial-gradient(circle at 0% 0%, #e0e7ff 0%, transparent 40%), radial-gradient(circle at 100% 100%, #ede9fe 0%, transparent 40%), radial-gradient(circle at 50% 50%, #c7d2fe 0%, transparent 50%);
+}
+body.theme-midnight:not(.light-mode) {
+  --bg-ambient: radial-gradient(circle at 0% 0%, rgba(79, 70, 229, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(79, 70, 229, 0.05) 0%, transparent 60%);
+}
+
+body.theme-aurora {
+  --primary: #0d9488; --primary-hover: #0f766e; --secondary: #8b5cf6; --secondary-hover: #7c3aed;
+  --bg-hover: rgba(13, 148, 136, 0.1); --shadow-glow: 0 0 20px rgba(13, 148, 136, 0.4);
+}
+body.theme-aurora.light-mode {
+  --bg-ambient: radial-gradient(circle at 0% 0%, #ccfbf1 0%, transparent 40%), radial-gradient(circle at 100% 100%, #ede9fe 0%, transparent 40%), radial-gradient(circle at 50% 50%, #a7f3d0 0%, transparent 50%);
+}
+body.theme-aurora:not(.light-mode) {
+  --bg-ambient: radial-gradient(circle at 0% 0%, rgba(13, 148, 136, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(13, 148, 136, 0.05) 0%, transparent 60%);
+}
+
+body.theme-rose {
+  --primary: #e11d48; --primary-hover: #be123c; --secondary: #dc2626; --secondary-hover: #b91c1c;
+  --bg-hover: rgba(225, 29, 72, 0.1); --shadow-glow: 0 0 20px rgba(225, 29, 72, 0.4);
+}
+body.theme-rose.light-mode {
+  --bg-ambient: radial-gradient(circle at 0% 0%, #ffe4e6 0%, transparent 40%), radial-gradient(circle at 100% 100%, #fee2e2 0%, transparent 40%), radial-gradient(circle at 50% 50%, #fecdd3 0%, transparent 50%);
+}
+body.theme-rose:not(.light-mode) {
+  --bg-ambient: radial-gradient(circle at 0% 0%, rgba(225, 29, 72, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(220, 38, 38, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(225, 29, 72, 0.05) 0%, transparent 60%);
+}
+
+body.theme-lavender {
+  --primary: #7c3aed; --primary-hover: #6d28d9; --secondary: #c026d3; --secondary-hover: #a21caf;
+  --bg-hover: rgba(124, 58, 237, 0.1); --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.4);
+}
+body.theme-lavender.light-mode {
+  --bg-ambient: radial-gradient(circle at 0% 0%, #ede9fe 0%, transparent 40%), radial-gradient(circle at 100% 100%, #fae8ff 0%, transparent 40%), radial-gradient(circle at 50% 50%, #ddd6fe 0%, transparent 50%);
+}
+body.theme-lavender:not(.light-mode) {
+  --bg-ambient: radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(192, 38, 211, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.05) 0%, transparent 60%);
+}
+
+body.theme-cyberpunk {
+  --primary: #ec4899; --primary-hover: #db2777; --secondary: #06b6d4; --secondary-hover: #0891b2;
+  --bg-hover: rgba(236, 72, 153, 0.1); --shadow-glow: 0 0 20px rgba(236, 72, 153, 0.4);
+}
+body.theme-cyberpunk.light-mode {
+  --bg-ambient: radial-gradient(circle at 0% 0%, #fce7f3 0%, transparent 40%), radial-gradient(circle at 100% 100%, #cffafe 0%, transparent 40%), radial-gradient(circle at 50% 50%, #fbcfe8 0%, transparent 50%);
+}
+body.theme-cyberpunk:not(.light-mode) {
+  --bg-ambient: radial-gradient(circle at 0% 0%, rgba(236, 72, 153, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 60%);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -202,7 +302,7 @@ input:focus, select:focus, textarea:focus {
     min-height: auto !important;
     overflow: visible !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 0 0 120px 0 !important;
     background: #fff !important;
     color: #000 !important;
   }
@@ -234,3 +334,35 @@ input:focus, select:focus, textarea:focus {
 @media print { div[style*='position: fixed'], div[style*='position:fixed'], iframe { display: none !important; } }
 @media print { body > *:not(#print-wrapper):not(#root):not(#pdf-print-wrapper) { display: none !important; } }
 @media print { html > *:not(body) { display: none !important; } }
+
+/* Common Print Footer UI Styles */
+.common-print-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: #000;
+  text-align: left;
+}
+
+.common-print-footer p {
+  margin: 0 0 4px 0;
+}
+
+.common-print-footer .footer-phone {
+  font-weight: bold;
+}
+
+@media print {
+  .common-print-footer {
+    display: block !important;
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    padding: 15px 20px;
+    margin-top: 0;
+    z-index: 9999;
+  }
+}
