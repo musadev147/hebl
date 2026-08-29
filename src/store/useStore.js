@@ -7,46 +7,65 @@ const useStore = create(
       // App State
       user: null, // { id, name, role: 'Admin' | 'Salesman' }
       theme: 'dark',
-      activeThemeClass: 'theme-default',
+      activeThemeClass: 'theme-forest',
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setThemeClass: (className) => set({ activeThemeClass: className }),
       login: (userData) => set({ user: userData }),
       logout: () => set({ user: null }),
 
-      // Core Data Tables (Initialized with Mock Data for demonstration)
+      // Core Data Tables
       inventory: [
-        { id: '10001', name: 'Premium Rice 50kg', category: 'Grocery', stock: 150, unit: 'Bag', price: 3500, dateAdded: new Date().toISOString() },
-        { id: '10002', name: 'Refined Oil 5L', category: 'Grocery', stock: 45, unit: 'Bottle', price: 850, dateAdded: new Date().toISOString() },
-        { id: '10003', name: 'Dal 1kg', category: 'Grocery', stock: 200, unit: 'Packet', price: 120, dateAdded: new Date().toISOString() },
+        { id: '10001', name: 'Bosch Impact Drill 13mm', category: 'Power Tools', stock: 15, unit: 'pcs', price: 3500, dateAdded: new Date().toISOString() },
+        { id: '10002', name: 'Steel Wire Brush 4x16', category: 'Hand Tools', stock: 120, unit: 'pcs', price: 35, dateAdded: new Date().toISOString() },
+        { id: '10003', name: 'Indian Lock Heavy Duty', category: 'Hardware', stock: 50, unit: 'pcs', price: 450, dateAdded: new Date().toISOString() },
+        { id: '10004', name: 'Angle Grinder 4 inch', category: 'Machine Tools', stock: 25, unit: 'pcs', price: 2200, dateAdded: new Date().toISOString() },
       ],
       customers: [
-        { id: 'C001', name: 'Karim Rahman', phone: '01711000000', location: 'Dhaka', due: 1500 },
-        { id: 'C002', name: 'Abdul Alim', phone: '01811000000', location: 'Chittagong', due: 0 },
+        { id: 'C001', name: 'Fahim Traders', phone: '01719563699', location: 'Kotchandpur', due: 1020 },
+        { id: 'C002', name: 'Zaman Hardware', phone: '01811000000', location: 'Dhaka', due: 5000 },
       ],
       suppliers: [
-        { id: 'S001', name: 'Rahim Traders', phone: '01911000000', due: 12000 },
-        { id: 'S002', name: 'Global Impex', phone: '01611000000', due: 0 },
+        { id: 'S001', name: 'Bosch Tools BD', phone: '01911000000', due: 15000 },
+        { id: 'S002', name: 'China Impex Ltd', phone: '01611000000', due: 50000 },
       ],
-      sales: [],      // Retail Sales & Gifts History
-      purchases: [],  // Supplier Purchases History
-      returns: [],    // Customer returns & Supplier rejects
-      settlements: [], // Due settlement history
+      sales: [
+        { id: 'INV' + (Date.now() - 86400000), date: new Date(Date.now() - 86400000).toISOString(), items: [{id: '10001', name: 'Bosch Impact Drill 13mm', quantity: 1, price: 3500, isGift: false}], subtotal: 3500, invoiceDiscount: 100, total: 3400, paymentType: 'Cash', customerId: 'C002', customerName: 'Zaman Hardware', salesmanId: 'ST001', salesmanName: 'Rashed', isGift: false },
+        { id: 'INV' + Date.now(), date: new Date().toISOString(), items: [{id: '10002', name: 'Steel Wire Brush 4x16', quantity: 12, price: 35, isGift: false}], subtotal: 420, invoiceDiscount: 0, total: 420, paymentType: 'Baki', customerId: 'C001', customerName: 'Fahim Traders', salesmanId: 'ST002', salesmanName: 'Hasan', isGift: false }
+      ],
+      purchases: [
+        { id: 'PUR' + (Date.now() - 172800000), date: new Date(Date.now() - 172800000).toISOString(), items: [{name: 'Indian Lock Heavy Duty', quantity: 50, price: 350}], supplierId: 'S002', supplierName: 'China Impex Ltd', paymentType: 'Baki', total: 17500, paidAmount: 5000, dueAmount: 12500 }
+      ],
+      returns: [
+        { id: 'RET' + Date.now(), date: new Date().toISOString(), returnType: 'Customer', productId: '10004', quantity: 1, reason: 'Motor issue' }
+      ],
+      settlements: [
+        { id: 'STL' + Date.now(), targetId: 'C001', type: 'Customer', amount: 500, date: new Date().toISOString() }
+      ],
       expenses: [
-        { id: 1, date: new Date().toISOString().split('T')[0], category: 'Transport', amount: 350, description: 'Van rent for rice delivery' },
-        { id: 2, date: new Date().toISOString().split('T')[0], category: 'Staff Cost', amount: 200, description: 'Lunch for staff' },
+        { id: 1, date: new Date().toISOString().split('T')[0], category: 'Transport', amount: 500, description: 'Carrying Loading for tools' },
+        { id: 2, date: new Date().toISOString().split('T')[0], category: 'Utility', amount: 1200, description: 'Electricity Bill' },
       ],
 
       // HR & Payroll State
       staff: [
-        { id: 'ST001', name: 'Rahim', role: 'Salesman', baseSalary: 12000, joinDate: '2023-01-15' },
-        { id: 'ST002', name: 'Karim', role: 'Salesman', baseSalary: 12000, joinDate: '2023-02-10' },
+        { id: 'ST001', name: 'Rashed', role: 'Store Incharge', baseSalary: 15000, joinDate: '2022-05-10' },
+        { id: 'ST002', name: 'Hasan', role: 'Delivery', baseSalary: 12000, joinDate: '2023-01-15' },
       ],
-      attendance: [], // { id, date, staffId, status: 'Present' | 'Absent' | 'Late' | 'Leave' }
-      leaves: [],     // { id, date, staffId, type: 'Casual' | 'Sick', reason, status: 'Pending' | 'Approved' | 'Rejected' }
-      payrolls: [],   // { id, month, year, staffId, presentDays, baseSalary, bonus, netPay, paymentDate }
+      attendance: [
+        { id: 1, staffId: 'ST001', date: new Date().toISOString().split('T')[0], status: 'Present' },
+        { id: 2, staffId: 'ST002', date: new Date().toISOString().split('T')[0], status: 'Late' }
+      ],
+      leaves: [
+        { id: 1, staffId: 'ST002', date: new Date(Date.now() + 86400000).toISOString().split('T')[0], type: 'Sick', reason: 'Fever', status: 'Pending' }
+      ],
+      payrolls: [
+        { id: 'PR' + Date.now(), staffId: 'ST001', staffName: 'Rashed', month: new Date().toISOString().substring(0, 7), presentDays: 28, baseSalary: 15000, bonus: 2000, netPay: 17000, paymentDate: new Date().toISOString() }
+      ],
 
       // SMS History
-      smsHistory: [],
+      smsHistory: [
+        { id: 'SMS1', date: new Date().toISOString(), numbers: ['01719563699'], message: 'Dear Fahim Traders, your due amount is 1020 TK. Please clear it soon.', status: 'Sent' }
+      ],
       addSmsToHistory: (smsData) => set((state) => ({
         smsHistory: [{ id: 'SMS' + Date.now(), date: new Date().toISOString(), ...smsData }, ...state.smsHistory]
       })),
@@ -326,40 +345,52 @@ const useStore = create(
         const justDate = todayStr.split('T')[0];
         return {
           inventory: [
-            { id: '10001', name: 'Premium Rice 50kg', category: 'Grocery', stock: 150, unit: 'Bag', price: 3500, dateAdded: todayStr },
-            { id: '10002', name: 'Refined Oil 5L', category: 'Grocery', stock: 45, unit: 'Bottle', price: 850, dateAdded: todayStr },
-            { id: '10003', name: 'Dal 1kg', category: 'Grocery', stock: 200, unit: 'Packet', price: 120, dateAdded: todayStr },
-            { id: '10004', name: 'Sugar 1kg', category: 'Grocery', stock: 100, unit: 'Packet', price: 140, dateAdded: todayStr },
+            { id: '10001', name: 'Bosch Impact Drill 13mm', category: 'Power Tools', stock: 15, unit: 'pcs', price: 3500, dateAdded: todayStr },
+            { id: '10002', name: 'Steel Wire Brush 4x16', category: 'Hand Tools', stock: 120, unit: 'pcs', price: 35, dateAdded: todayStr },
+            { id: '10003', name: 'Indian Lock Heavy Duty', category: 'Hardware', stock: 50, unit: 'pcs', price: 450, dateAdded: todayStr },
+            { id: '10004', name: 'Angle Grinder 4 inch', category: 'Machine Tools', stock: 25, unit: 'pcs', price: 2200, dateAdded: todayStr },
           ],
           customers: [
-            { id: 'C001', name: 'Karim Rahman', phone: '01711000000', location: 'Dhaka', due: 1500 },
-            { id: 'C002', name: 'Abdul Alim', phone: '01811000000', location: 'Chittagong', due: 0 },
+            { id: 'C001', name: 'Fahim Traders', phone: '01719563699', location: 'Kotchandpur', due: 1020 },
+            { id: 'C002', name: 'Zaman Hardware', phone: '01811000000', location: 'Dhaka', due: 5000 },
           ],
           suppliers: [
-            { id: 'S001', name: 'Rahim Traders', phone: '01911000000', due: 12000 },
-            { id: 'S002', name: 'Global Impex', phone: '01611000000', due: 0 },
+            { id: 'S001', name: 'Bosch Tools BD', phone: '01911000000', due: 15000 },
+            { id: 'S002', name: 'China Impex Ltd', phone: '01611000000', due: 50000 },
           ],
           staff: [
-            { id: 'ST001', name: 'Rahim', role: 'Salesman', baseSalary: 12000, joinDate: '2023-01-15' },
-            { id: 'ST002', name: 'Karim', role: 'Salesman', baseSalary: 12000, joinDate: '2023-02-10' },
+            { id: 'ST001', name: 'Rashed', role: 'Store Incharge', baseSalary: 15000, joinDate: '2022-05-10' },
+            { id: 'ST002', name: 'Hasan', role: 'Delivery', baseSalary: 12000, joinDate: '2023-01-15' },
           ],
           sales: [
-            { id: 'INV1001', date: todayStr, items: [{id: '10001', name: 'Premium Rice 50kg', quantity: 2, price: 3500, isGift: false}], subtotal: 7000, invoiceDiscount: 100, total: 6900, paymentType: 'Cash', customerName: 'Karim Rahman', salesmanName: 'Rahim', isGift: false },
-            { id: 'INV1002', date: todayStr, items: [{id: '10002', name: 'Refined Oil 5L', quantity: 1, price: 850, isGift: false}], subtotal: 850, invoiceDiscount: 0, total: 850, paymentType: 'Baki', customerName: 'Abdul Alim', salesmanName: 'Karim', isGift: false },
+            { id: 'INV' + (Date.now() - 86400000), date: new Date(Date.now() - 86400000).toISOString(), items: [{id: '10001', name: 'Bosch Impact Drill 13mm', quantity: 1, price: 3500, isGift: false}], subtotal: 3500, invoiceDiscount: 100, total: 3400, paymentType: 'Cash', customerId: 'C002', customerName: 'Zaman Hardware', salesmanId: 'ST001', salesmanName: 'Rashed', isGift: false },
+            { id: 'INV' + Date.now(), date: todayStr, items: [{id: '10002', name: 'Steel Wire Brush 4x16', quantity: 12, price: 35, isGift: false}], subtotal: 420, invoiceDiscount: 0, total: 420, paymentType: 'Baki', customerId: 'C001', customerName: 'Fahim Traders', salesmanId: 'ST002', salesmanName: 'Hasan', isGift: false }
           ],
           purchases: [
-            { id: 'PUR2001', date: todayStr, items: [{name: 'Premium Rice 50kg', quantity: 50}], supplierName: 'Rahim Traders', paymentType: 'Baki', total: 150000 }
-          ],
-          expenses: [
-            { id: 1, date: justDate, category: 'Transport', amount: 350, description: 'Van rent' },
-            { id: 2, date: justDate, category: 'Electricity', amount: 1200, description: 'Monthly bill' },
+            { id: 'PUR' + (Date.now() - 172800000), date: new Date(Date.now() - 172800000).toISOString(), items: [{name: 'Indian Lock Heavy Duty', quantity: 50, price: 350}], supplierId: 'S002', supplierName: 'China Impex Ltd', paymentType: 'Baki', total: 17500, paidAmount: 5000, dueAmount: 12500 }
           ],
           returns: [
-            { id: 'RET3001', date: todayStr, returnType: 'Customer', productId: '10001', quantity: 1, reason: 'Damaged packaging' },
-            { id: 'RET3002', date: todayStr, returnType: 'Supplier', productId: '10002', quantity: 2, reason: 'Expired product' }
+            { id: 'RET' + Date.now(), date: todayStr, returnType: 'Customer', productId: '10004', quantity: 1, reason: 'Motor issue' }
+          ],
+          settlements: [
+            { id: 'STL' + Date.now(), targetId: 'C001', type: 'Customer', amount: 500, date: todayStr }
+          ],
+          expenses: [
+            { id: 1, date: justDate, category: 'Transport', amount: 500, description: 'Carrying Loading for tools' },
+            { id: 2, date: justDate, category: 'Utility', amount: 1200, description: 'Electricity Bill' },
+          ],
+          attendance: [
+            { id: 1, staffId: 'ST001', date: justDate, status: 'Present' },
+            { id: 2, staffId: 'ST002', date: justDate, status: 'Late' }
+          ],
+          leaves: [
+            { id: 1, staffId: 'ST002', date: new Date(Date.now() + 86400000).toISOString().split('T')[0], type: 'Sick', reason: 'Fever', status: 'Pending' }
           ],
           payrolls: [
-            { id: 'PR4001', staffId: 'ST001', staffName: 'Rahim', month: justDate.substring(0, 7), presentDays: 28, baseSalary: 12000, bonus: 1000, netPay: 12200, paymentDate: todayStr }
+            { id: 'PR' + Date.now(), staffId: 'ST001', staffName: 'Rashed', month: justDate.substring(0, 7), presentDays: 28, baseSalary: 15000, bonus: 2000, netPay: 17000, paymentDate: todayStr }
+          ],
+          smsHistory: [
+            { id: 'SMS1', date: todayStr, numbers: ['01719563699'], message: 'Dear Fahim Traders, your due amount is 1020 TK. Please clear it soon.', status: 'Sent' }
           ]
         };
       }),

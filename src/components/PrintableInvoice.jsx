@@ -23,40 +23,45 @@ const PrintableInvoice = ({ sale, customers }) => {
     <div style={{ padding: '1.5rem', background: '#fff', color: '#000', fontFamily: 'Arial, sans-serif' }}>
       <InvoiceHeader />
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <strong>Code:</strong> 
-          <span style={{ borderBottom: '1px dashed #000', minWidth: '150px', display: 'inline-block' }}></span>
-        </div>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <strong>Date:</strong> 
-          <span style={{ borderBottom: '1px dashed #000', minWidth: '150px', display: 'inline-block' }}>{dateStr}</span>
-        </div>
-      </div>
-
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', fontSize: '0.9rem' }}>
-        <div style={{ flex: 1 }}>
+        {/* Left Column */}
+        <div style={{ width: '52%', paddingRight: '10px' }}>
+          <div style={{ display: 'flex', gap: '5px', marginBottom: '5px', marginTop: '20px' }}>
+            <strong style={{ whiteSpace: 'nowrap' }}>Code:</strong> 
+            <span style={{ borderBottom: '1px dashed #000', flex: 1 }}></span>
+          </div>
           <div style={{ display: 'flex', gap: '5px', marginBottom: '5px' }}>
-            <strong>Buyer's Name:</strong> 
+            <strong style={{ whiteSpace: 'nowrap' }}>Buyer's Name:</strong> 
             <span style={{ borderBottom: '1px dashed #000', flex: 1 }}>{customerName}</span>
           </div>
           <div style={{ display: 'flex', gap: '5px', marginBottom: '5px' }}>
-            <strong>Address:</strong> 
+            <strong style={{ whiteSpace: 'nowrap' }}>Address:</strong> 
             <span style={{ borderBottom: '1px dashed #000', flex: 1 }}>{sale.customerInfo?.location || customer?.location || ''}</span>
           </div>
           <div style={{ display: 'flex', gap: '5px' }}>
-            <strong>Mobile:</strong> 
+            <strong style={{ whiteSpace: 'nowrap' }}>Mobile:</strong> 
             <span style={{ borderBottom: '1px dashed #000', flex: 1 }}>{sale.customerInfo?.phone || customer?.phone || ''}</span>
           </div>
         </div>
-        <div style={{ width: '280px', paddingLeft: '1rem', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+
+        {/* Right Column */}
+        <div style={{ width: '46%', paddingLeft: '5px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.1rem', marginBottom: '2px', marginLeft: '-20px' }}>BILL</div>
           <div style={{ display: 'flex', gap: '5px' }}>
-            <strong>Challan / Invoice ID:</strong> 
+            <strong style={{ whiteSpace: 'nowrap' }}>Date:</strong> 
+            <span style={{ borderBottom: '1px dashed #000', flex: 1 }}>{dateStr}</span>
+          </div>
+          <div style={{ display: 'flex', gap: '5px' }}>
+            <strong style={{ whiteSpace: 'nowrap' }}>Challan No:</strong> 
             <span style={{ borderBottom: '1px dashed #000', flex: 1 }}>{sale.id || sale.invoiceId}</span>
           </div>
           <div style={{ display: 'flex', gap: '5px' }}>
-            <strong>Seller / Reff:</strong> 
+            <strong style={{ whiteSpace: 'nowrap' }}>Seller Reff:</strong> 
             <span style={{ borderBottom: '1px dashed #000', flex: 1 }}>{sale.salesman?.name || sale.salesmanName || ''}</span>
+          </div>
+          <div style={{ display: 'flex', gap: '5px' }}>
+            <strong style={{ whiteSpace: 'nowrap' }}>Mobile:</strong> 
+            <span style={{ borderBottom: '1px dashed #000', flex: 1 }}></span>
           </div>
         </div>
       </div>
@@ -101,49 +106,51 @@ const PrintableInvoice = ({ sale, customers }) => {
       </table>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem' }}>
-        <div style={{ width: '40%' }}>
+        <div style={{ width: '48%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #000', marginBottom: '2px' }}>
-            <span>Current Due:</span><span>{currentDue}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>Current Due:</span><span>{currentDue}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #000', marginBottom: '2px' }}>
-            <span>Previous Due:</span><span>{actualPreviousDue}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>Previous Due:</span><span>{actualPreviousDue}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #000', marginBottom: '2px' }}>
-            <span>Over all Due:</span><span>{overallDue}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>Over all Due:</span><span>{overallDue}</span>
           </div>
         </div>
         
-        <div style={{ width: '35%' }}>
+        <div style={{ width: '46%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Total</span><span>{sale.subtotal}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>Total</span><span>{sale.subtotal}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Total Discount</span><span>{sale.invoiceDiscount || 0}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>Total Discount</span><span>{sale.invoiceDiscount || 0}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Carrying/Loading</span><span>0</span>
+            <span style={{ whiteSpace: 'nowrap' }}>Carrying/Loading</span><span>0</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Net Sales</span><span>{sale.total}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>Net Sales</span><span>{sale.total}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Paid</span><span>{sale.paymentType === 'Cash' ? sale.total : 0}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>Paid</span><span>{sale.paymentType === 'Cash' ? sale.total : 0}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span>Due</span><span>{currentDue}</span>
+            <span style={{ whiteSpace: 'nowrap' }}>Due</span><span>{currentDue}</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', borderTop: '1px solid #000', paddingTop: '2px' }}>
-            <span>Total Tk:</span><span style={{ fontSize: '0.85rem' }}>{sale.total} Taka Only</span>
+            <span style={{ whiteSpace: 'nowrap' }}>Total Tk:</span><span style={{ fontSize: '0.85rem' }}>{sale.total} Taka Only</span>
           </div>
         </div>
       </div>
 
-      <PrintFooter />
+      <div style={{ pageBreakInside: 'avoid' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4rem', marginBottom: '2rem', fontSize: '0.9rem' }}>
+          <div style={{ borderTop: '1px solid #000', width: '25%', textAlign: 'center' }}>Customer signature</div>
+          <div style={{ borderTop: '1px solid #000', width: '25%', textAlign: 'center' }}>Delivery By</div>
+          <div style={{ borderTop: '1px solid #000', width: '25%', textAlign: 'center' }}>Store Incharge</div>
+        </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4rem', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-        <div style={{ borderTop: '1px solid #000', width: '25%', textAlign: 'center' }}>Customer signature</div>
-        <div style={{ borderTop: '1px solid #000', width: '25%', textAlign: 'center' }}>Delivery By</div>
-        <div style={{ borderTop: '1px solid #000', width: '25%', textAlign: 'center' }}>Store Incharge</div>
+        <PrintFooter />
       </div>
 
     </div>

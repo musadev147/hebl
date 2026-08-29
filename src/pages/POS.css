@@ -171,9 +171,9 @@
 }
 
 .checkout-btn:disabled {
-  background-color: var(--bg-hover);
-  color: var(--text-muted);
   cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
 }
 
 @media (max-width: 768px) {

@@ -284,6 +284,10 @@ input:focus, select:focus, textarea:focus {
 
 /* Print Styles */
 @media print {
+  @page {
+    size: A5;
+    margin: 10mm;
+  }
   .print-only-header {
     display: block !important;
     text-align: center;
@@ -356,13 +360,10 @@ input:focus, select:focus, textarea:focus {
 @media print {
   .common-print-footer {
     display: block !important;
-    position: fixed !important;
-    bottom: 0;
-    left: 0;
+    position: relative !important;
     width: 100%;
     background: white;
-    padding: 15px 20px;
+    padding: 15px 0px;
     margin-top: 0;
-    z-index: 9999;
   }
 }

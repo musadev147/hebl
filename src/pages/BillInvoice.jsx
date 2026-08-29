@@ -306,11 +306,11 @@ const BillInvoice = () => {
             </div>
           </div>
 
-          <div className="checkout-actions" style={{ flexDirection: 'column', gap: '0.5rem' }}>
-            <button className="btn-primary checkout-btn" onClick={handleCheckout} disabled={cart.length === 0}>
+          <div className="checkout-actions" style={{ display: 'flex', gap: '0.5rem' }}>
+            <button className="btn-primary checkout-btn" style={{ flex: 1, padding: '0.8rem 0.5rem', fontSize: '0.9rem' }} onClick={handleCheckout} disabled={cart.length === 0}>
               Generate Final Invoice
             </button>
-            <button className="btn-outline checkout-btn" onClick={handleSaveDraft} disabled={cart.length === 0}>
+            <button className="btn-outline checkout-btn" style={{ flex: 1, padding: '0.8rem 0.5rem', fontSize: '0.9rem' }} onClick={handleSaveDraft} disabled={cart.length === 0}>
               Save as Draft
             </button>
           </div>
