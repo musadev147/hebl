@@ -130,6 +130,7 @@ const Layout = () => {
         { path: '/invoice?action=draft', search: '?action=draft', name: 'Draft Invoice' },
         { path: '/returns?action=add', search: '?action=add', name: 'New Return' },
         { path: '/returns', search: '', name: 'Return List' },
+        { path: '/sr-settlements', search: '', name: 'SR Daily Accounts' },
       ]
     },
     { 
@@ -140,6 +141,7 @@ const Layout = () => {
         { path: '/inventory', search: '', name: 'Product List' },
         { path: '/purchases?action=add', search: '?action=add', name: 'New Purchase' },
         { path: '/purchases', search: '', name: 'Purchase List' },
+        { path: '/stock', search: '', name: 'Stock Form' },
       ]
     },
     { 
@@ -150,6 +152,7 @@ const Layout = () => {
         { path: '/customers', search: '', name: 'Customer Due List' },
         { path: '/suppliers?action=add', search: '?action=add', name: 'Add Supplier' },
         { path: '/suppliers', search: '', name: 'Supplier Due List' },
+        { path: '/staff-dues', search: '', name: 'Staff/SR Due List' },
         { path: '/expenses?action=add', search: '?action=add', name: 'Add Expense' },
         { path: '/expenses', search: '', name: 'Expense List' },
       ]

@@ -298,6 +298,63 @@ const useStore = create(
         expenses: [{ id: Date.now(), ...expense }, ...state.expenses]
       })),
 
+      // SR SETTLEMENTS
+      srSettlements: [],
+      issueProductsToSR: (settlementData) => set((state) => {
+        const newInventory = [...state.inventory];
+        settlementData.items.forEach(item => {
+          const invIndex = newInventory.findIndex(i => i.id === item.productId);
+          if (invIndex !== -1) {
+            newInventory[invIndex] = { ...newInventory[invIndex], stock: newInventory[invIndex].stock - item.quantity };
+          }
+        });
+        return {
+          inventory: newInventory,
+          srSettlements: [{ ...settlementData, id: 'SR' + Date.now(), status: 'Pending' }, ...(state.srSettlements || [])]
+        };
+      }),
+      updateSRSettlement: (id, updates) => set((state) => ({
+        srSettlements: (state.srSettlements || []).map(s => s.id === id ? { ...s, ...updates } : s)
+      })),
+      settleSRAccount: (id, cashReceived, returnItems = []) => set((state) => {
+        const newInventory = [...state.inventory];
+        returnItems.forEach(item => {
+           const invIndex = newInventory.findIndex(i => String(i.id) === String(item.productId));
+           if (invIndex !== -1) {
+             newInventory[invIndex] = { ...newInventory[invIndex], stock: newInventory[invIndex].stock + (item.returnQty || 0) };
+           }
+        });
+
+        const settlement = (state.srSettlements || []).find(s => s.id === id);
+        let dueAmount = 0;
+        if (settlement) {
+           const finalSales = returnItems.reduce((acc, item) => acc + ((item.issuedQty - item.returnQty) * item.price), 0);
+           dueAmount = Math.max(0, finalSales - cashReceived);
+        }
+
+        const newStaff = [...(state.staff || [])];
+        if (settlement && dueAmount > 0) {
+           const staffIndex = newStaff.findIndex(s => String(s.id) === String(settlement.salesmanId));
+           if (staffIndex !== -1) {
+              newStaff[staffIndex] = { ...newStaff[staffIndex], due: (newStaff[staffIndex].due || 0) + dueAmount };
+           }
+        }
+
+        return {
+          inventory: newInventory,
+          staff: newStaff,
+          srSettlements: (state.srSettlements || []).map(s => s.id === id ? { ...s, status: 'Settled', cashReceived, returnItems } : s)
+        };
+      }),
+      payStaffDue: (staffId, amount, dateStr) => set((state) => {
+        const date = dateStr || new Date().toISOString();
+        const settlementRecord = { id: 'STL' + Date.now(), targetId: staffId, type: 'Staff', amount, date };
+        return {
+          staff: state.staff.map(s => String(s.id) === String(staffId) ? { ...s, due: Math.max(0, (s.due || 0) - amount) } : s),
+          settlements: [settlementRecord, ...(state.settlements || [])]
+        };
+      }),
+
       // HR ACTIONS
       addStaff: (staffData) => set((state) => ({
         staff: [...state.staff, { id: 'ST' + Date.now(), ...staffData }]
@@ -391,6 +448,22 @@ const useStore = create(
           ],
           smsHistory: [
             { id: 'SMS1', date: todayStr, numbers: ['01719563699'], message: 'Dear Fahim Traders, your due amount is 1020 TK. Please clear it soon.', status: 'Sent' }
+          ],
+          srSettlements: [
+            {
+              id: 'SR_DUMMY_1',
+              date: justDate,
+              salesmanId: 'ST001',
+              salesmanName: 'Rashed',
+              items: [
+                { productId: '10001', name: 'Bosch Impact Drill 13mm', quantity: 2, price: 3500 },
+                { productId: '10002', name: 'Steel Wire Brush 4x16', quantity: 10, price: 35 }
+              ],
+              totalIssuedValue: 7350,
+              totalSalesValue: 7350,
+              cashReceived: 0,
+              status: 'Pending'
+            }
           ]
         };
       }),

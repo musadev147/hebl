@@ -10,13 +10,14 @@ import PrintFooter from '../components/PrintFooter';
 import './Inventory.css';
 
 const Inventory = () => {
-  const { inventory, addInventoryItem, deleteInventoryItem } = useStore();
+  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterDate, setFilterDate] = useState('All Time');
   const [customDateRange, setCustomDateRange] = useState({ start: '', end: '' });
   const [showBarcodeModal, setShowBarcodeModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [editingProduct, setEditingProduct] = useState(null);
   const [printQuantity, setPrintQuantity] = useState(21); // Default to 21 (3x7 grid)
 
   const [newProduct, setNewProduct] = useState({
@@ -35,17 +36,31 @@ const Inventory = () => {
     }
   }, [location.search]);
 
-  const handleAddProduct = (e) => {
+  const handleSaveProduct = (e) => {
     e.preventDefault();
     if (!newProduct.id || !newProduct.name) {
       alert('ID and Name are required!');
       return;
     }
     
-    // Add to global store
-    addInventoryItem(newProduct);
+    if (editingProduct) {
+      updateInventoryItem(editingProduct.id, newProduct);
+    } else {
+      addInventoryItem(newProduct);
+    }
     
+    closeModal();
+  };
+
+  const openEditModal = (product) => {
+    setEditingProduct(product);
+    setNewProduct({ ...product });
+    setShowAddModal(true);
+  };
+
+  const closeModal = () => {
     setShowAddModal(false);
+    setEditingProduct(null);
     setNewProduct({ id: '', name: '', category: 'Grocery', unit: 'Bag', variant: '', stock: 0, price: 0 });
   };
 
@@ -200,7 +215,7 @@ const Inventory = () => {
                       <button className="btn-icon" title="Print Barcode" onClick={() => handlePrintBarcode(item)}>
                         <Printer size={16} />
                       </button>
-                      <button className="btn-icon text-info" title="Edit">
+                      <button className="btn-icon text-info" title="Edit" onClick={() => openEditModal(item)}>
                         <Edit size={16} />
                       </button>
                       <button className="btn-icon text-danger" title="Delete" onClick={() => deleteInventoryItem(item.id)}>
@@ -332,17 +347,17 @@ const Inventory = () => {
         <div className="drawer-overlay">
           <div className="drawer-container">
             <div className="drawer-header">
-              <h2>Add New Product</h2>
-              <button className="drawer-close-btn" onClick={() => setShowAddModal(false)}>
+              <h2>{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
+              <button className="drawer-close-btn" onClick={closeModal}>
                 <Plus size={24} style={{ transform: 'rotate(45deg)' }} />
               </button>
             </div>
             <div className="drawer-body">
-              <form id="add-product-form" onSubmit={handleAddProduct}>
+              <form id="add-product-form" onSubmit={handleSaveProduct}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
                   <div>
                     <label className="text-muted text-sm block mb-1">Product ID / Barcode *</label>
-                    <input type="text" className="w-full" value={newProduct.id} onChange={e => setNewProduct({...newProduct, id: e.target.value})} required placeholder="e.g. 10004" />
+                    <input type="text" className="w-full" value={newProduct.id} onChange={e => setNewProduct({...newProduct, id: e.target.value})} required placeholder="e.g. 10004" disabled={!!editingProduct} />
                   </div>
                   <div>
                     <label className="text-muted text-sm block mb-1">Product Name *</label>
@@ -382,8 +397,11 @@ const Inventory = () => {
               </form>
             </div>
             <div className="drawer-footer">
-              <button type="button" className="btn-outline" onClick={() => setShowAddModal(false)}>Cancel</button>
-              <button type="submit" form="add-product-form" className="btn-primary flex-align-gap"><Plus size={18} /> Save Product</button>
+              <button type="button" className="btn-outline" onClick={closeModal}>Cancel</button>
+              <button type="submit" form="add-product-form" className="btn-primary flex-align-gap">
+                {editingProduct ? <Edit size={18} /> : <Plus size={18} />} 
+                {editingProduct ? 'Update Product' : 'Save Product'}
+              </button>
             </div>
           </div>
         </div>,
