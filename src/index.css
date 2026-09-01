@@ -341,6 +341,7 @@ input:focus, select:focus, textarea:focus {
 
 /* Common Print Footer UI Styles */
 .common-print-footer {
+  display: none;
   margin-top: 2rem;
   padding-top: 1rem;
   font-size: 0.85rem;
