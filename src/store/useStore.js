@@ -10,7 +10,18 @@ const useStore = create(
       activeThemeClass: 'theme-forest',
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setThemeClass: (className) => set({ activeThemeClass: className }),
-      login: (userData) => set({ user: userData }),
+      login: (userData) => {
+        // Simple mock authentication logic
+        if (userData.username === 'admin' && userData.password === 'admin') {
+           set({ user: userData });
+           return { success: true };
+        } else if (userData.username && userData.password) {
+           // Allow any valid dummy login for now, or you can restrict it
+           set({ user: userData });
+           return { success: true };
+        }
+        return { success: false };
+      },
       logout: () => set({ user: null }),
 
       // Core Data Tables
