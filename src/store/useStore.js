@@ -16,13 +16,13 @@ const useStore = create(
            set({ user: userData });
            return { success: true };
         } else if (userData.username && userData.password) {
-           // Allow any valid dummy login for now, or you can restrict it
            set({ user: userData });
            return { success: true };
         }
         return { success: false };
       },
       logout: () => set({ user: null }),
+      fetchAllData: async () => {},
 
       // Core Data Tables
       inventory: [
