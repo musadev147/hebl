@@ -570,7 +570,7 @@ const Inventory = () => {
 
       {/* Add Product Drawer */}
       {showAddModal && createPortal(
-        <div className="drawer-overlay" onClick={closeModal}>
+        <div className="drawer-overlay" onClick={() => { setShowAddModal(false); navigate('/inventory'); }}>
           <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Add New Product</h2>
