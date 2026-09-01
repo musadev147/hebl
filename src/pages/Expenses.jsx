@@ -188,8 +188,8 @@ const Expenses = () => {
 
       {/* Add Expense Drawer */}
       {showModal && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setShowModal(false)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Add New Expense</h2>
               <button className="drawer-close-btn" onClick={() => setShowModal(false)}>
@@ -252,8 +252,8 @@ const Expenses = () => {
 
       {/* Monthly Report Drawer */}
       {showReport && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container" style={{ maxWidth: '600px', width: '100%' }}>
+        <div className="drawer-overlay" onClick={() => setShowReport(false)}>
+          <div className="drawer-container" style={{ maxWidth: '600px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Monthly Expense Report</h2>
               <button className="drawer-close-btn text-danger" onClick={() => setShowReport(false)}><X size={24}/></button>
@@ -325,8 +325,8 @@ const Expenses = () => {
 
       {/* Single Expense Drawer */}
       {selectedExpense && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setSelectedExpense(null)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Expense Voucher</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedExpense(null)}>

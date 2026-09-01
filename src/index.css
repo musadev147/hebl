@@ -14,9 +14,9 @@
 
   /* Glass Light Mode */
   --bg-main: #f8fafc;
-  --bg-ambient: radial-gradient(circle at 0% 0%, #ffedd5 0%, transparent 40%),
-                radial-gradient(circle at 100% 100%, #e0f2fe 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, #fef3c7 0%, transparent 50%);
+  --bg-ambient: radial-gradient(circle at 0% 0%, #ffedd5 0%, rgba(255,255,255,0) 40%),
+                radial-gradient(circle at 100% 100%, #e0f2fe 0%, rgba(255,255,255,0) 40%),
+                radial-gradient(circle at 50% 50%, #fef3c7 0%, rgba(255,255,255,0) 50%);
   
   --bg-card: rgba(255, 255, 255, 0.7); /* Frosted Glass */
   --bg-card-hover: rgba(255, 255, 255, 0.9);
@@ -75,7 +75,7 @@ body.theme-ocean {
   --bg-hover: rgba(2, 132, 199, 0.1); --shadow-glow: 0 0 20px rgba(2, 132, 199, 0.4);
 }
 body.theme-ocean.light-mode {
-  --bg-ambient: radial-gradient(circle at 0% 0%, #e0f2fe 0%, transparent 40%), radial-gradient(circle at 100% 100%, #ccfbf1 0%, transparent 40%), radial-gradient(circle at 50% 50%, #bae6fd 0%, transparent 50%);
+  --bg-ambient: radial-gradient(circle at 0% 0%, #e0f2fe 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 100% 100%, #ccfbf1 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 50% 50%, #bae6fd 0%, rgba(255,255,255,0) 50%);
 }
 body.theme-ocean:not(.light-mode) {
   --bg-ambient: radial-gradient(circle at 0% 0%, rgba(2, 132, 199, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(13, 148, 136, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(2, 132, 199, 0.05) 0%, transparent 60%);
@@ -86,7 +86,7 @@ body.theme-sunset {
   --bg-hover: rgba(234, 88, 12, 0.1); --shadow-glow: 0 0 20px rgba(234, 88, 12, 0.4);
 }
 body.theme-sunset.light-mode {
-  --bg-ambient: radial-gradient(circle at 0% 0%, #ffedd5 0%, transparent 40%), radial-gradient(circle at 100% 100%, #ffe4e6 0%, transparent 40%), radial-gradient(circle at 50% 50%, #ffedd5 0%, transparent 50%);
+  --bg-ambient: radial-gradient(circle at 0% 0%, #ffedd5 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 100% 100%, #ffe4e6 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 50% 50%, #ffedd5 0%, rgba(255,255,255,0) 50%);
 }
 body.theme-sunset:not(.light-mode) {
   --bg-ambient: radial-gradient(circle at 0% 0%, rgba(234, 88, 12, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(225, 29, 72, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(234, 88, 12, 0.05) 0%, transparent 60%);
@@ -97,7 +97,7 @@ body.theme-forest {
   --bg-hover: rgba(22, 163, 74, 0.1); --shadow-glow: 0 0 20px rgba(22, 163, 74, 0.4);
 }
 body.theme-forest.light-mode {
-  --bg-ambient: radial-gradient(circle at 0% 0%, #dcfce7 0%, transparent 40%), radial-gradient(circle at 100% 100%, #d1fae5 0%, transparent 40%), radial-gradient(circle at 50% 50%, #bbf7d0 0%, transparent 50%);
+  --bg-ambient: radial-gradient(circle at 0% 0%, #dcfce7 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 100% 100%, #d1fae5 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 50% 50%, #bbf7d0 0%, rgba(255,255,255,0) 50%);
 }
 body.theme-forest:not(.light-mode) {
   --bg-ambient: radial-gradient(circle at 0% 0%, rgba(22, 163, 74, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(5, 150, 105, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(22, 163, 74, 0.05) 0%, transparent 60%);
@@ -108,7 +108,7 @@ body.theme-berry {
   --bg-hover: rgba(147, 51, 234, 0.1); --shadow-glow: 0 0 20px rgba(147, 51, 234, 0.4);
 }
 body.theme-berry.light-mode {
-  --bg-ambient: radial-gradient(circle at 0% 0%, #f3e8ff 0%, transparent 40%), radial-gradient(circle at 100% 100%, #fce7f3 0%, transparent 40%), radial-gradient(circle at 50% 50%, #e9d5ff 0%, transparent 50%);
+  --bg-ambient: radial-gradient(circle at 0% 0%, #f3e8ff 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 100% 100%, #fce7f3 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 50% 50%, #e9d5ff 0%, rgba(255,255,255,0) 50%);
 }
 body.theme-berry:not(.light-mode) {
   --bg-ambient: radial-gradient(circle at 0% 0%, rgba(147, 51, 234, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(219, 39, 119, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(147, 51, 234, 0.05) 0%, transparent 60%);
@@ -119,7 +119,7 @@ body.theme-midnight {
   --bg-hover: rgba(79, 70, 229, 0.1); --shadow-glow: 0 0 20px rgba(79, 70, 229, 0.4);
 }
 body.theme-midnight.light-mode {
-  --bg-ambient: radial-gradient(circle at 0% 0%, #e0e7ff 0%, transparent 40%), radial-gradient(circle at 100% 100%, #ede9fe 0%, transparent 40%), radial-gradient(circle at 50% 50%, #c7d2fe 0%, transparent 50%);
+  --bg-ambient: radial-gradient(circle at 0% 0%, #e0e7ff 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 100% 100%, #ede9fe 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 50% 50%, #c7d2fe 0%, rgba(255,255,255,0) 50%);
 }
 body.theme-midnight:not(.light-mode) {
   --bg-ambient: radial-gradient(circle at 0% 0%, rgba(79, 70, 229, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(124, 58, 237, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(79, 70, 229, 0.05) 0%, transparent 60%);
@@ -130,7 +130,7 @@ body.theme-aurora {
   --bg-hover: rgba(13, 148, 136, 0.1); --shadow-glow: 0 0 20px rgba(13, 148, 136, 0.4);
 }
 body.theme-aurora.light-mode {
-  --bg-ambient: radial-gradient(circle at 0% 0%, #ccfbf1 0%, transparent 40%), radial-gradient(circle at 100% 100%, #ede9fe 0%, transparent 40%), radial-gradient(circle at 50% 50%, #a7f3d0 0%, transparent 50%);
+  --bg-ambient: radial-gradient(circle at 0% 0%, #ccfbf1 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 100% 100%, #ede9fe 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 50% 50%, #a7f3d0 0%, rgba(255,255,255,0) 50%);
 }
 body.theme-aurora:not(.light-mode) {
   --bg-ambient: radial-gradient(circle at 0% 0%, rgba(13, 148, 136, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(13, 148, 136, 0.05) 0%, transparent 60%);
@@ -141,7 +141,7 @@ body.theme-rose {
   --bg-hover: rgba(225, 29, 72, 0.1); --shadow-glow: 0 0 20px rgba(225, 29, 72, 0.4);
 }
 body.theme-rose.light-mode {
-  --bg-ambient: radial-gradient(circle at 0% 0%, #ffe4e6 0%, transparent 40%), radial-gradient(circle at 100% 100%, #fee2e2 0%, transparent 40%), radial-gradient(circle at 50% 50%, #fecdd3 0%, transparent 50%);
+  --bg-ambient: radial-gradient(circle at 0% 0%, #ffe4e6 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 100% 100%, #fee2e2 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 50% 50%, #fecdd3 0%, rgba(255,255,255,0) 50%);
 }
 body.theme-rose:not(.light-mode) {
   --bg-ambient: radial-gradient(circle at 0% 0%, rgba(225, 29, 72, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(220, 38, 38, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(225, 29, 72, 0.05) 0%, transparent 60%);
@@ -152,7 +152,7 @@ body.theme-lavender {
   --bg-hover: rgba(124, 58, 237, 0.1); --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.4);
 }
 body.theme-lavender.light-mode {
-  --bg-ambient: radial-gradient(circle at 0% 0%, #ede9fe 0%, transparent 40%), radial-gradient(circle at 100% 100%, #fae8ff 0%, transparent 40%), radial-gradient(circle at 50% 50%, #ddd6fe 0%, transparent 50%);
+  --bg-ambient: radial-gradient(circle at 0% 0%, #ede9fe 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 100% 100%, #fae8ff 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 50% 50%, #ddd6fe 0%, rgba(255,255,255,0) 50%);
 }
 body.theme-lavender:not(.light-mode) {
   --bg-ambient: radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(192, 38, 211, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.05) 0%, transparent 60%);
@@ -163,7 +163,7 @@ body.theme-cyberpunk {
   --bg-hover: rgba(236, 72, 153, 0.1); --shadow-glow: 0 0 20px rgba(236, 72, 153, 0.4);
 }
 body.theme-cyberpunk.light-mode {
-  --bg-ambient: radial-gradient(circle at 0% 0%, #fce7f3 0%, transparent 40%), radial-gradient(circle at 100% 100%, #cffafe 0%, transparent 40%), radial-gradient(circle at 50% 50%, #fbcfe8 0%, transparent 50%);
+  --bg-ambient: radial-gradient(circle at 0% 0%, #fce7f3 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 100% 100%, #cffafe 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 50% 50%, #fbcfe8 0%, rgba(255,255,255,0) 50%);
 }
 body.theme-cyberpunk:not(.light-mode) {
   --bg-ambient: radial-gradient(circle at 0% 0%, rgba(236, 72, 153, 0.15) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.15) 0%, transparent 45%), radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 60%);

@@ -467,8 +467,8 @@ const Purchase = () => {
 
       {/* History Print Drawer */}
       {selectedInvoice && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setSelectedInvoice(null)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Purchase Receipt</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedInvoice(null)}>

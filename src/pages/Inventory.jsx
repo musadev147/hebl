@@ -283,8 +283,8 @@ const Inventory = () => {
 
       {/* Barcode Drawer */}
       {showBarcodeModal && selectedProduct && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setShowBarcodeModal(false)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Generate Barcode</h2>
               <button className="drawer-close-btn" onClick={() => setShowBarcodeModal(false)}>
@@ -344,8 +344,8 @@ const Inventory = () => {
 
       {/* Add Product Drawer */}
       {showAddModal && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={closeModal}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
               <button className="drawer-close-btn" onClick={closeModal}>

@@ -241,8 +241,8 @@ const StockRegister = () => {
 
       {/* Quick Add Stock Drawer */}
       {showAddModal && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container" style={{ maxWidth: '400px' }}>
+        <div className="drawer-overlay" onClick={() => setShowAddModal(false)}>
+          <div className="drawer-container" style={{ maxWidth: '400px' }} onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Quick Add Stock In</h2>
               <button className="drawer-close-btn" onClick={() => setShowAddModal(false)}>

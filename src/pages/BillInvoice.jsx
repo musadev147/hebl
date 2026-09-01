@@ -411,8 +411,8 @@ const BillInvoice = () => {
 
       {/* Invoice Drawer */}
       {completedSale && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setCompletedSale(null)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Invoice View</h3>
               <button className="drawer-close-btn" onClick={() => setCompletedSale(null)}>
@@ -447,8 +447,8 @@ const BillInvoice = () => {
       )}
 
       {selectedInvoice && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setSelectedInvoice(null)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Invoice View</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedInvoice(null)}>

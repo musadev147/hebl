@@ -113,8 +113,8 @@ const StaffDueList = () => {
       </div>
 
       {showPayModal && selectedStaff && (
-        <div className="modal-overlay">
-          <div className="modal-container">
+        <div className="modal-overlay" onClick={() => setShowPayModal(false)}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Receive Due from {selectedStaff.name}</h3>
               <button className="btn-icon" onClick={() => setShowPayModal(false)}><Plus size={24} style={{ transform: 'rotate(45deg)' }} /></button>

@@ -574,8 +574,8 @@ const Reports = () => {
 
       {/* Invoice Drawer for Print */}
       {selectedInvoice && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setSelectedInvoice(null)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Document Print</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedInvoice(null)}>

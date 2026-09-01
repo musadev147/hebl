@@ -269,8 +269,8 @@ const Customers = () => {
 
       {/* Settle Due Drawer */}
       {settleModal.show && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container" style={{ maxWidth: '400px' }}>
+        <div className="drawer-overlay" onClick={() => setSettleModal({ show: false, target: null, amount: '', date: '' })}>
+          <div className="drawer-container" style={{ maxWidth: '400px' }} onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Settle Due</h2>
               <button className="drawer-close-btn" onClick={() => setSettleModal({ show: false, target: null, amount: '', date: '' })}>
@@ -326,8 +326,8 @@ const Customers = () => {
 
       {/* SMS Drawer */}
       {smsModal.show && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setSmsModal({ show: false, target: null, message: '' })}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Send SMS</h2>
               <button type="button" className="drawer-close-btn" onClick={() => setSmsModal({ show: false, target: null, message: '' })}>
@@ -357,8 +357,8 @@ const Customers = () => {
 
       {/* Print Single Person Drawer */}
       {selectedPerson && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setSelectedPerson(null)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h3 style={{ margin: 0 }}>Due Statement</h3>
               <button className="drawer-close-btn" onClick={() => setSelectedPerson(null)}>
@@ -446,8 +446,8 @@ const Customers = () => {
 
       {/* Add Customer Drawer */}
       {showAddModal && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setShowAddModal(false)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Add New Customer</h2>
               <button type="button" className="drawer-close-btn" onClick={() => setShowAddModal(false)}>

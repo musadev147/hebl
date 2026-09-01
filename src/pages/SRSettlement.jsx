@@ -282,8 +282,8 @@ const SRSettlement = () => {
 
       {/* Modal: Issue Stock */}
       {showIssueModal && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container" style={{ maxWidth: '600px' }}>
+        <div className="drawer-overlay" onClick={() => setShowIssueModal(false)}>
+          <div className="drawer-container" style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Issue Stock to SR</h2>
               <button className="drawer-close-btn" onClick={() => setShowIssueModal(false)}>
@@ -360,8 +360,8 @@ const SRSettlement = () => {
 
       {/* Modal: Settle & Edit Single Single */}
       {showSettleModal && activeSettlement && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container" style={{ maxWidth: '600px' }}>
+        <div className="drawer-overlay" onClick={() => setShowSettleModal(false)}>
+          <div className="drawer-container" style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Settle Account: {activeSettlement.salesmanName}</h2>
               <button className="drawer-close-btn" onClick={() => setShowSettleModal(false)}>

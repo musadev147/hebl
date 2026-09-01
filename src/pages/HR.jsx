@@ -354,8 +354,8 @@ const HR = () => {
 
       {/* Add Staff Drawer */}
       {showAddStaffModal && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setShowAddStaffModal(false)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Add New Staff</h2>
               <button type="button" className="drawer-close-btn" onClick={() => setShowAddStaffModal(false)}>
@@ -415,8 +415,8 @@ const HR = () => {
 
       {/* Apply Leave Drawer */}
       {showLeaveModal && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setShowLeaveModal(false)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
               <h2>Apply Leave</h2>
               <button type="button" className="drawer-close-btn" onClick={() => setShowLeaveModal(false)}>
@@ -461,8 +461,8 @@ const HR = () => {
 
       {/* View & Print Staff Drawer */}
       {selectedStaff && createPortal(
-        <div className="drawer-overlay">
-          <div className="drawer-container">
+        <div className="drawer-overlay" onClick={() => setSelectedStaff(null)}>
+          <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             
             <div className="drawer-header" style={{ borderBottom: 'none' }}>
               <h3 style={{ margin: 0, fontSize: '1.2rem' }}>Staff Profile Document</h3>

@@ -301,9 +301,7 @@ body:not(.light-mode) .data-table th {
   right: 0;
   width: 100%;
   max-width: 600px;
-  background-color: var(--bg-card);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  background-color: var(--bg-main); /* Using a solid color so it doesn't look messy over the ambient background */
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
   z-index: 10000;
   display: flex;
