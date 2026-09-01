@@ -1,135 +1,77 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import apiClient from '../api/client';
-import { ENDPOINTS } from '../api/endpoints';
 
 const useStore = create(
   persist(
     (set, get) => ({
-      // User & Auth
-      user: null,
-      token: null,
+      // App State
+      user: null, // { id, name, role: 'Admin' | 'Salesman' }
       theme: 'dark',
       activeThemeClass: 'theme-forest',
-      isLoading: false,
-
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setThemeClass: (className) => set({ activeThemeClass: className }),
+      login: (userData) => set({ user: userData }),
+      logout: () => set({ user: null }),
 
-      login: async (credentials) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.LOGIN, {
-            username: credentials.username,
-            password: credentials.password,
-            role: credentials.role || 'Admin',
-          });
-          const token = res.access || res.token;
-          if (token) {
-            localStorage.setItem('ehbl_token', token);
-          }
-          const userData = {
-            id: res.user?.id || 1,
-            username: res.user?.username || credentials.username,
-            name: res.user?.name || res.user?.first_name || credentials.username,
-            role: res.user?.role || credentials.role || 'Admin',
-            email: res.user?.email || '',
-          };
-          set({ user: userData, token });
-          // Synchronize all data from backend
-          get().fetchAllData();
-          return { success: true, user: userData };
-        } catch (err) {
-          console.error('Backend login failed:', err);
-          const msg = (err?.response?.data && (err.response.data.non_field_errors?.[0] || err.response.data.detail || err.response.data.error || Object.values(err.response.data)[0])) || 'Invalid username or password.';
-          return { success: false, error: typeof msg === 'string' ? msg : JSON.stringify(msg) };
-        }
-      },
+      // Core Data Tables
+      inventory: [
+        { id: '10001', name: 'Bosch Impact Drill 13mm', category: 'Power Tools', stock: 15, unit: 'pcs', price: 3500, dateAdded: new Date().toISOString() },
+        { id: '10002', name: 'Steel Wire Brush 4x16', category: 'Hand Tools', stock: 120, unit: 'pcs', price: 35, dateAdded: new Date().toISOString() },
+        { id: '10003', name: 'Indian Lock Heavy Duty', category: 'Hardware', stock: 50, unit: 'pcs', price: 450, dateAdded: new Date().toISOString() },
+        { id: '10004', name: 'Angle Grinder 4 inch', category: 'Machine Tools', stock: 25, unit: 'pcs', price: 2200, dateAdded: new Date().toISOString() },
+      ],
+      customers: [
+        { id: 'C001', name: 'Fahim Traders', phone: '01719563699', location: 'Kotchandpur', due: 1020 },
+        { id: 'C002', name: 'Zaman Hardware', phone: '01811000000', location: 'Dhaka', due: 5000 },
+      ],
+      suppliers: [
+        { id: 'S001', name: 'Bosch Tools BD', phone: '01911000000', due: 15000 },
+        { id: 'S002', name: 'China Impex Ltd', phone: '01611000000', due: 50000 },
+      ],
+      sales: [
+        { id: 'INV' + (Date.now() - 86400000), date: new Date(Date.now() - 86400000).toISOString(), items: [{id: '10001', name: 'Bosch Impact Drill 13mm', quantity: 1, price: 3500, isGift: false}], subtotal: 3500, invoiceDiscount: 100, total: 3400, paymentType: 'Cash', customerId: 'C002', customerName: 'Zaman Hardware', salesmanId: 'ST001', salesmanName: 'Rashed', isGift: false },
+        { id: 'INV' + Date.now(), date: new Date().toISOString(), items: [{id: '10002', name: 'Steel Wire Brush 4x16', quantity: 12, price: 35, isGift: false}], subtotal: 420, invoiceDiscount: 0, total: 420, paymentType: 'Baki', customerId: 'C001', customerName: 'Fahim Traders', salesmanId: 'ST002', salesmanName: 'Hasan', isGift: false }
+      ],
+      purchases: [
+        { id: 'PUR' + (Date.now() - 172800000), date: new Date(Date.now() - 172800000).toISOString(), items: [{name: 'Indian Lock Heavy Duty', quantity: 50, price: 350}], supplierId: 'S002', supplierName: 'China Impex Ltd', paymentType: 'Baki', total: 17500, paidAmount: 5000, dueAmount: 12500 }
+      ],
+      returns: [
+        { id: 'RET' + Date.now(), date: new Date().toISOString(), returnType: 'Customer', productId: '10004', quantity: 1, reason: 'Motor issue' }
+      ],
+      settlements: [
+        { id: 'STL' + Date.now(), targetId: 'C001', type: 'Customer', amount: 500, date: new Date().toISOString() }
+      ],
+      expenses: [
+        { id: 1, date: new Date().toISOString().split('T')[0], category: 'Transport', amount: 500, description: 'Carrying Loading for tools' },
+        { id: 2, date: new Date().toISOString().split('T')[0], category: 'Utility', amount: 1200, description: 'Electricity Bill' },
+      ],
 
-      logout: () => {
-        localStorage.removeItem('ehbl_token');
-        set({ user: null, token: null });
-      },
+      // HR & Payroll State
+      staff: [
+        { id: 'ST001', name: 'Rashed', role: 'Store Incharge', baseSalary: 15000, joinDate: '2022-05-10' },
+        { id: 'ST002', name: 'Hasan', role: 'Delivery', baseSalary: 12000, joinDate: '2023-01-15' },
+      ],
+      attendance: [
+        { id: 1, staffId: 'ST001', date: new Date().toISOString().split('T')[0], status: 'Present' },
+        { id: 2, staffId: 'ST002', date: new Date().toISOString().split('T')[0], status: 'Late' }
+      ],
+      leaves: [
+        { id: 1, staffId: 'ST002', date: new Date(Date.now() + 86400000).toISOString().split('T')[0], type: 'Sick', reason: 'Fever', status: 'Pending' }
+      ],
+      payrolls: [
+        { id: 'PR' + Date.now(), staffId: 'ST001', staffName: 'Rashed', month: new Date().toISOString().substring(0, 7), presentDays: 28, baseSalary: 15000, bonus: 2000, netPay: 17000, paymentDate: new Date().toISOString() }
+      ],
 
-      // Core State
-      inventory: [],
-      categories: [],
-      units: [],
-      customers: [],
-      suppliers: [],
-      sales: [],
-      purchases: [],
-      returns: [],
-      settlements: [],
-      expenses: [],
-      staff: [],
-      attendance: [],
-      leaves: [],
-      payrolls: [],
-      smsHistory: [],
+      // SMS History
+      smsHistory: [
+        { id: 'SMS1', date: new Date().toISOString(), numbers: ['01719563699'], message: 'Dear Fahim Traders, your due amount is 1020 TK. Please clear it soon.', status: 'Sent' }
+      ],
+      addSmsToHistory: (smsData) => set((state) => ({
+        smsHistory: [{ id: 'SMS' + Date.now(), date: new Date().toISOString(), ...smsData }, ...state.smsHistory]
+      })),
 
-      // Fetch all data from Django Backend
-      fetchAllData: async () => {
-        set({ isLoading: true });
-        try {
-          const [
-            invRes,
-            catRes,
-            unitRes,
-            custRes,
-            supRes,
-            salesRes,
-            purRes,
-            retRes,
-            settleRes,
-            expRes,
-            staffRes,
-            attRes,
-            leaveRes,
-            payRes,
-            smsRes,
-          ] = await Promise.allSettled([
-            apiClient.get(ENDPOINTS.PRODUCTS),
-            apiClient.get(ENDPOINTS.CATEGORIES),
-            apiClient.get(ENDPOINTS.UNITS),
-            apiClient.get(ENDPOINTS.CUSTOMERS),
-            apiClient.get(ENDPOINTS.SUPPLIERS),
-            apiClient.get(ENDPOINTS.SALES),
-            apiClient.get(ENDPOINTS.PURCHASES),
-            apiClient.get(ENDPOINTS.RETURNS),
-            apiClient.get(ENDPOINTS.SETTLEMENTS),
-            apiClient.get(ENDPOINTS.EXPENSES),
-            apiClient.get(ENDPOINTS.STAFF),
-            apiClient.get(ENDPOINTS.ATTENDANCE),
-            apiClient.get(ENDPOINTS.LEAVES),
-            apiClient.get(ENDPOINTS.PAYROLLS),
-            apiClient.get(ENDPOINTS.SMS_HISTORY),
-          ]);
 
-          const updates = {};
-          if (invRes.status === 'fulfilled' && Array.isArray(invRes.value)) updates.inventory = invRes.value;
-          if (catRes.status === 'fulfilled' && Array.isArray(catRes.value)) updates.categories = catRes.value;
-          if (unitRes.status === 'fulfilled' && Array.isArray(unitRes.value)) updates.units = unitRes.value;
-          if (custRes.status === 'fulfilled' && Array.isArray(custRes.value)) updates.customers = custRes.value;
-          if (supRes.status === 'fulfilled' && Array.isArray(supRes.value)) updates.suppliers = supRes.value;
-          if (salesRes.status === 'fulfilled' && Array.isArray(salesRes.value)) updates.sales = salesRes.value;
-          if (purRes.status === 'fulfilled' && Array.isArray(purRes.value)) updates.purchases = purRes.value;
-          if (retRes.status === 'fulfilled' && Array.isArray(retRes.value)) updates.returns = retRes.value;
-          if (settleRes.status === 'fulfilled' && Array.isArray(settleRes.value)) updates.settlements = settleRes.value;
-          if (expRes.status === 'fulfilled' && Array.isArray(expRes.value)) updates.expenses = expRes.value;
-          if (staffRes.status === 'fulfilled' && Array.isArray(staffRes.value)) updates.staff = staffRes.value;
-          if (attRes.status === 'fulfilled' && Array.isArray(attRes.value)) updates.attendance = attRes.value;
-          if (leaveRes.status === 'fulfilled' && Array.isArray(leaveRes.value)) updates.leaves = leaveRes.value;
-          if (payRes.status === 'fulfilled' && Array.isArray(payRes.value)) updates.payrolls = payRes.value;
-          if (smsRes.status === 'fulfilled' && Array.isArray(smsRes.value)) updates.smsHistory = smsRes.value;
-
-          set({ ...updates, isLoading: false });
-        } catch (err) {
-          console.error('Error fetching data from backend:', err);
-          set({ isLoading: false });
-        }
-      },
-
-      // Cart State (In-memory POS state)
+      // Cart State (Temporary, not persisted to DB logically but kept in Zustand)
       cart: [],
       addToCart: (product) => set((state) => {
         const existing = state.cart.find((item) => item.id === product.id);
@@ -152,141 +94,198 @@ const useStore = create(
       })),
       clearCart: () => set({ cart: [] }),
 
-      // CATEGORY & UNIT ACTIONS
-      addCategory: async (categoryName) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.CATEGORIES, { name: categoryName });
-          const newCat = res || { id: Date.now(), name: categoryName };
-          set((state) => ({ categories: [...state.categories.filter(c => (c.name || c) !== categoryName), newCat] }));
-          return newCat;
-        } catch (err) {
-          console.error('Failed to add category:', err);
-          const fallback = { id: Date.now(), name: categoryName };
-          set((state) => ({ categories: [...state.categories, fallback] }));
-          return fallback;
-        }
-      },
-      addUnit: async (unitName) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.UNITS, { name: unitName });
-          const newU = res || { id: Date.now(), name: unitName };
-          set((state) => ({ units: [...state.units.filter(u => (u.name || u) !== unitName), newU] }));
-          return newU;
-        } catch (err) {
-          console.error('Failed to add unit:', err);
-          const fallback = { id: Date.now(), name: unitName };
-          set((state) => ({ units: [...state.units, fallback] }));
-          return fallback;
-        }
-      },
+      // INVENTORY LOGIC
+      addInventoryItem: (item) => set((state) => ({
+        inventory: [{ ...item, dateAdded: item.dateAdded || new Date().toISOString() }, ...state.inventory]
+      })),
+      updateInventoryItem: (id, updates) => set((state) => ({
+        inventory: state.inventory.map(item => item.id === id ? { ...item, ...updates } : item)
+      })),
+      deleteInventoryItem: (id) => set((state) => ({
+        inventory: state.inventory.filter(item => item.id !== id)
+      })),
 
-      // INVENTORY ACTIONS (Async API + Store update)
-      addInventoryItem: async (item) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.PRODUCTS, item);
-          const savedItem = res || item;
-          set((state) => ({
-            inventory: [savedItem, ...state.inventory.filter((i) => i.id !== savedItem.id)]
-          }));
-          return savedItem;
-        } catch (err) {
-          console.error('Failed to add product to backend:', err);
-          const fallback = { ...item, dateAdded: item.dateAdded || new Date().toISOString() };
-          set((state) => ({ inventory: [fallback, ...state.inventory] }));
-          return fallback;
-        }
-      },
+      // DUE MANAGEMENT
+      settleCustomerDue: (customerId, amount, dateStr) => set((state) => {
+        const date = dateStr || new Date().toISOString();
+        const settlementRecord = { id: 'STL' + Date.now(), targetId: customerId, type: 'Customer', amount, date };
+        return {
+          customers: state.customers.map(c => 
+            c.id === customerId ? { ...c, due: Math.max(0, c.due - amount) } : c
+          ),
+          settlements: [settlementRecord, ...(state.settlements || [])]
+        };
+      }),
+      settleSupplierDue: (supplierId, amount, dateStr) => set((state) => {
+        const date = dateStr || new Date().toISOString();
+        const settlementRecord = { id: 'STL' + Date.now(), targetId: supplierId, type: 'Supplier', amount, date };
+        return {
+          suppliers: state.suppliers.map(s => 
+            s.id === supplierId ? { ...s, due: Math.max(0, s.due - amount) } : s
+          ),
+          settlements: [settlementRecord, ...(state.settlements || [])]
+        };
+      }),
 
-      updateInventoryItem: async (id, updates) => {
-        try {
-          const res = await apiClient.patch(ENDPOINTS.PRODUCT_DETAILS(id), updates);
-          const updated = res || updates;
-          set((state) => ({
-            inventory: state.inventory.map((item) => (item.id === id ? { ...item, ...updated } : item))
-          }));
-        } catch (err) {
-          console.error('Failed to update product on backend:', err);
-          set((state) => ({
-            inventory: state.inventory.map((item) => (item.id === id ? { ...item, ...updates } : item))
-          }));
-        }
-      },
+      // BUSINESS LOGIC ACTIONS
 
-      deleteInventoryItem: async (id) => {
-        try {
-          await apiClient.delete(ENDPOINTS.PRODUCT_DETAILS(id));
-          set((state) => ({
-            inventory: state.inventory.filter((item) => item.id !== id)
-          }));
-        } catch (err) {
-          console.error('Failed to delete product on backend:', err);
-          set((state) => ({
-            inventory: state.inventory.filter((item) => item.id !== id)
-          }));
-        }
-      },
+      processSale: ({ cartItems, paymentType, customerInfo, invoiceDiscount, salesman }) => set((state) => {
+        const newInventory = [...state.inventory];
+        let subtotal = 0;
+        let isGiftInvoice = false;
 
-      // CONTACTS (Customers & Suppliers)
-      addCustomer: async (customerData) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.CUSTOMERS, customerData);
-          const saved = res || customerData;
-          set((state) => ({
-            customers: [saved, ...state.customers]
-          }));
-          return saved;
-        } catch (err) {
-          console.error('Failed to add customer on backend:', err);
-          const fallback = { id: 'C' + Date.now(), due: 0, ...customerData };
-          set((state) => ({ customers: [...state.customers, fallback] }));
-          return fallback;
-        }
-      },
+        cartItems.forEach(cartItem => {
+          // Adjust Inventory (Deduct stock)
+          const invIndex = newInventory.findIndex(i => i.id === cartItem.id);
+          if (invIndex !== -1) {
+            newInventory[invIndex] = { ...newInventory[invIndex], stock: newInventory[invIndex].stock - cartItem.quantity };
+          }
+          if (!cartItem.isGift) {
+            subtotal += (cartItem.price - cartItem.itemDiscount) * cartItem.quantity;
+          } else {
+            isGiftInvoice = true;
+          }
+        });
 
-      addSupplier: async (supplierData) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.SUPPLIERS, supplierData);
-          const saved = res || supplierData;
-          set((state) => ({
-            suppliers: [saved, ...state.suppliers]
-          }));
-          return saved;
-        } catch (err) {
-          console.error('Failed to add supplier on backend:', err);
-          const fallback = { id: 'SUP' + Date.now(), due: 0, ...supplierData };
-          set((state) => ({ suppliers: [...state.suppliers, fallback] }));
-          return fallback;
-        }
-      },
+        const total = Math.max(0, subtotal - invoiceDiscount);
+        
+        // Handle Baki (Due)
+        const newCustomers = [...state.customers];
+        let customerId = null;
 
-      updateSupplier: async (supplierId, updates) => {
-        try {
-          await apiClient.patch(ENDPOINTS.SUPPLIER_DETAILS(supplierId), updates);
-        } catch (err) {
-          console.error('Failed to update supplier on backend:', err);
+        if (customerInfo.name) {
+          const existingCustIndex = newCustomers.findIndex(c => c.phone === customerInfo.phone || c.name === customerInfo.name);
+          if (existingCustIndex !== -1) {
+            customerId = newCustomers[existingCustIndex].id;
+            if (paymentType === 'Baki') {
+              newCustomers[existingCustIndex] = { ...newCustomers[existingCustIndex], due: newCustomers[existingCustIndex].due + total };
+            }
+          } else {
+            customerId = 'C' + Date.now();
+            newCustomers.push({
+              id: customerId,
+              name: customerInfo.name,
+              phone: customerInfo.phone || '',
+              location: customerInfo.location || '',
+              due: paymentType === 'Baki' ? total : 0
+            });
+          }
         }
-        set((state) => ({
-          suppliers: state.suppliers.map((s) => (s.id === supplierId ? { ...s, ...updates } : s))
-        }));
-      },
 
-<<<<<<< HEAD
-      // DUE SETTLEMENT
-      settleCustomerDue: async (customerId, amount, dateStr) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.SETTLE_DUE, {
-            targetId: customerId,
-            type: 'Customer',
-            amount: parseFloat(amount),
-            date: dateStr,
-          });
-          const settlementRecord = res?.settlement || {
-            id: 'STL' + Date.now(),
-            targetId: customerId,
-            type: 'Customer',
-            amount,
-            date: dateStr || new Date().toISOString()
-=======
+        const saleRecord = {
+          id: 'INV' + Date.now(),
+          date: new Date().toISOString(),
+          items: cartItems,
+          subtotal,
+          invoiceDiscount,
+          total,
+          paymentType,
+          customerId,
+          customerName: customerInfo.name || 'Walk-in Customer',
+          salesmanId: salesman?.id || 'Admin',
+          salesmanName: salesman?.name || 'Admin',
+          isGift: isGiftInvoice && total === 0
+        };
+
+        return {
+          inventory: newInventory,
+          customers: newCustomers,
+          sales: [saleRecord, ...state.sales],
+          cart: [] // clear cart on success
+        };
+      }),
+
+      processPurchase: ({ items, supplierId, supplierName, paymentType, total, paidAmount }) => set((state) => {
+        const newInventory = [...state.inventory];
+        
+        items.forEach(item => {
+          const invIndex = newInventory.findIndex(i => i.name.toLowerCase() === item.name.toLowerCase());
+          if (invIndex !== -1) {
+            newInventory[invIndex] = { ...newInventory[invIndex], stock: newInventory[invIndex].stock + item.quantity };
+          } else {
+            // Add new product
+            newInventory.push({
+              id: 'P' + Date.now() + Math.floor(Math.random()*100),
+              name: item.name,
+              category: 'Uncategorized',
+              variant: item.variant || '',
+              unit: 'Pcs',
+              stock: item.quantity,
+              price: item.price // Note: this is purchase price, not retail, but simplified here
+            });
+          }
+        });
+
+        const dueAmount = total - paidAmount;
+        const newSuppliers = [...state.suppliers];
+        
+        if (dueAmount > 0) {
+          const supIndex = newSuppliers.findIndex(s => s.id === supplierId);
+          if (supIndex !== -1) {
+            newSuppliers[supIndex] = { ...newSuppliers[supIndex], due: newSuppliers[supIndex].due + dueAmount };
+          }
+        }
+
+        const purchaseRecord = {
+          id: 'PUR' + Date.now(),
+          date: new Date().toISOString(),
+          items,
+          supplierId,
+          supplierName,
+          paymentType,
+          total,
+          paidAmount,
+          dueAmount
+        };
+
+        return {
+          inventory: newInventory,
+          suppliers: newSuppliers,
+          purchases: [purchaseRecord, ...state.purchases]
+        };
+      }),
+
+      processReturn: ({ returnType, productId, quantity, reason }) => set((state) => {
+        const newInventory = [...state.inventory];
+        const invIndex = newInventory.findIndex(i => i.id === productId);
+        
+        if (invIndex !== -1) {
+          if (returnType === 'Customer') {
+            // Customer returned to us -> increase stock
+            newInventory[invIndex] = { ...newInventory[invIndex], stock: newInventory[invIndex].stock + quantity };
+          } else {
+            // We rejected to supplier -> decrease stock
+            newInventory[invIndex] = { ...newInventory[invIndex], stock: newInventory[invIndex].stock - quantity };
+          }
+        }
+
+        const returnRecord = {
+          id: 'RET' + Date.now(),
+          date: new Date().toISOString(),
+          returnType, // 'Customer' | 'Supplier'
+          productId,
+          quantity,
+          reason
+        };
+
+        return {
+          inventory: newInventory,
+          returns: [returnRecord, ...state.returns]
+        };
+      }),
+
+      payCustomerDue: (customerId, amount) => set((state) => ({
+        customers: state.customers.map(c => c.id === customerId ? { ...c, due: Math.max(0, c.due - amount) } : c)
+      })),
+
+      paySupplierDue: (supplierId, amount) => set((state) => ({
+        suppliers: state.suppliers.map(s => s.id === supplierId ? { ...s, due: Math.max(0, s.due - amount) } : s)
+      })),
+
+      addSupplier: (supplierData) => set((state) => ({
+        suppliers: [...state.suppliers, { id: 'SUP' + Date.now(), due: 0, ...supplierData }]
+      })),
+
       addCustomer: (customerData) => set((state) => ({
         customers: [...state.customers, { id: 'C' + Date.now(), due: 0, ...customerData }]
       })),
@@ -370,162 +369,34 @@ const useStore = create(
         } else {
           return {
             attendance: [...state.attendance, { id: Date.now() + Math.random(), staffId, date, status }]
->>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
           };
-          set((state) => ({
-            customers: state.customers.map((c) =>
-              c.id === customerId ? { ...c, due: Math.max(0, parseFloat(c.due || 0) - amount) } : c
-            ),
-            settlements: [settlementRecord, ...(state.settlements || [])]
-          }));
-        } catch (err) {
-          console.error('Failed to settle customer due on backend:', err);
-          const settlementRecord = { id: 'STL' + Date.now(), targetId: customerId, type: 'Customer', amount, date: dateStr || new Date().toISOString() };
-          set((state) => ({
-            customers: state.customers.map((c) =>
-              c.id === customerId ? { ...c, due: Math.max(0, (c.due || 0) - amount) } : c
-            ),
-            settlements: [settlementRecord, ...(state.settlements || [])]
-          }));
         }
-      },
+      }),
 
-      settleSupplierDue: async (supplierId, amount, dateStr) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.SETTLE_DUE, {
-            targetId: supplierId,
-            type: 'Supplier',
-            amount: parseFloat(amount),
-            date: dateStr,
-          });
-          const settlementRecord = res?.settlement || {
-            id: 'STL' + Date.now(),
-            targetId: supplierId,
-            type: 'Supplier',
-            amount,
-            date: dateStr || new Date().toISOString()
-          };
-          set((state) => ({
-            suppliers: state.suppliers.map((s) =>
-              s.id === supplierId ? { ...s, due: Math.max(0, parseFloat(s.due || 0) - amount) } : s
-            ),
-            settlements: [settlementRecord, ...(state.settlements || [])]
-          }));
-        } catch (err) {
-          console.error('Failed to settle supplier due on backend:', err);
-          const settlementRecord = { id: 'STL' + Date.now(), targetId: supplierId, type: 'Supplier', amount, date: dateStr || new Date().toISOString() };
-          set((state) => ({
-            suppliers: state.suppliers.map((s) =>
-              s.id === supplierId ? { ...s, due: Math.max(0, (s.due || 0) - amount) } : s
-            ),
-            settlements: [settlementRecord, ...(state.settlements || [])]
-          }));
-        }
-      },
+      addLeaveRequest: (leaveData) => set((state) => ({
+        leaves: [{ id: Date.now(), ...leaveData, status: 'Pending' }, ...state.leaves]
+      })),
 
-      // POS SALES ACTION
-      processSale: async (salePayload) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.SALES, salePayload);
-          const savedSale = res || {
-            id: 'INV' + Date.now(),
-            date: new Date().toISOString(),
-            ...salePayload,
-          };
-          // Re-sync inventory & customers to get exact updated stock and dues from backend
-          get().fetchAllData();
-          return savedSale;
-        } catch (err) {
-          console.error('Failed to process sale on backend:', err);
-          // Local fallback
-          const saleRecord = {
-            id: 'INV' + Date.now(),
-            date: new Date().toISOString(),
-            items: salePayload.cartItems,
-            subtotal: salePayload.cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
-            invoiceDiscount: salePayload.invoiceDiscount || 0,
-            total: salePayload.total || 0,
-            paymentType: salePayload.paymentType,
-            customerId: salePayload.customerInfo?.id,
-            customerName: salePayload.customerInfo?.name,
-            salesmanId: get().user?.id,
-            salesmanName: get().user?.name,
-            isGift: false,
-          };
-          set((state) => ({
-            sales: [saleRecord, ...state.sales],
-            cart: []
-          }));
-          return saleRecord;
-        }
-      },
+      updateLeaveStatus: (leaveId, status) => set((state) => ({
+        leaves: state.leaves.map(l => l.id === leaveId ? { ...l, status } : l)
+      })),
 
-      // PURCHASES ACTION
-      processPurchase: async (purchasePayload) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.PURCHASES, purchasePayload);
-          get().fetchAllData();
-          return res;
-        } catch (err) {
-          console.error('Failed to process purchase on backend:', err);
-          const purchaseRecord = {
-            id: 'PUR' + Date.now(),
-            date: new Date().toISOString(),
-            ...purchasePayload,
-          };
-          set((state) => ({
-            purchases: [purchaseRecord, ...state.purchases]
-          }));
-          return purchaseRecord;
-        }
-      },
+      generatePayslip: (payrollData) => set((state) => {
+        // Automatically add to expenses
+        const expenseEntry = {
+          id: Date.now() + 1,
+          date: new Date().toISOString().split('T')[0],
+          category: 'Staff Cost',
+          amount: payrollData.netPay,
+          description: `Salary for ${payrollData.staffName} (${payrollData.month} ${payrollData.year})`
+        };
 
-      // RETURNS ACTION
-      processReturn: async ({ returnType, productId, quantity, reason }) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.RETURNS, {
-            returnType,
-            productId,
-            quantity: parseInt(quantity) || 1,
-            reason,
-          });
-          get().fetchAllData();
-          return res;
-        } catch (err) {
-          console.error('Failed to process return on backend:', err);
-          const returnRecord = {
-            id: 'RET' + Date.now(),
-            date: new Date().toISOString(),
-            returnType,
-            productId,
-            quantity,
-            reason
-          };
-          set((state) => ({
-            returns: [returnRecord, ...state.returns]
-          }));
-          return returnRecord;
-        }
-      },
+        return {
+          payrolls: [{ id: 'PR' + Date.now(), ...payrollData, paymentDate: new Date().toISOString() }, ...state.payrolls],
+          expenses: [expenseEntry, ...state.expenses]
+        };
+      }),
 
-<<<<<<< HEAD
-      // EXPENSES
-      addExpense: async (expense) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.EXPENSES, expense);
-          const saved = res || expense;
-          set((state) => ({
-            expenses: [saved, ...state.expenses]
-          }));
-          return saved;
-        } catch (err) {
-          console.error('Failed to add expense to backend:', err);
-          const fallback = { id: Date.now(), ...expense };
-          set((state) => ({ expenses: [fallback, ...state.expenses] }));
-          return fallback;
-        }
-      },
-=======
       loadDummyData: () => set((state) => {
         const todayStr = new Date().toISOString();
         const justDate = todayStr.split('T')[0];
@@ -596,120 +467,10 @@ const useStore = create(
           ]
         };
       }),
->>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
 
-      // HR & PAYROLL
-      addStaff: async (staffData) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.STAFF, staffData);
-          set((state) => ({
-            staff: [res || staffData, ...state.staff]
-          }));
-        } catch (err) {
-          console.error('Failed to add staff to backend:', err);
-          set((state) => ({
-            staff: [...state.staff, { id: 'ST' + Date.now(), ...staffData }]
-          }));
-        }
-      },
-
-      markAttendance: async (staffId, date, status) => {
-        try {
-          await apiClient.post(ENDPOINTS.MARK_ATTENDANCE, { staffId, date, status });
-        } catch (err) {
-          console.error('Failed to mark attendance on backend:', err);
-        }
-        set((state) => {
-          const existingIndex = state.attendance.findIndex((a) => a.staffId === staffId && a.date === date);
-          if (existingIndex !== -1) {
-            const newAttendance = [...state.attendance];
-            newAttendance[existingIndex] = { ...newAttendance[existingIndex], status };
-            return { attendance: newAttendance };
-          }
-          return {
-            attendance: [...state.attendance, { id: Date.now(), staffId, date, status }]
-          };
-        });
-      },
-
-      addLeaveRequest: async (leaveData) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.LEAVES, leaveData);
-          get().fetchAllData();
-          return res;
-        } catch (err) {
-          console.error('Failed to add leave request to backend:', err);
-          set((state) => ({
-            leaves: [{ id: Date.now(), ...leaveData, status: 'Pending' }, ...state.leaves]
-          }));
-        }
-      },
-
-      updateLeaveStatus: async (leaveId, status) => {
-        try {
-          await apiClient.post(`/hr/leaves/${leaveId}/status/`, { status });
-          get().fetchAllData();
-        } catch (err) {
-          console.error('Failed to update leave status on backend:', err);
-          set((state) => ({
-            leaves: state.leaves.map((l) => (l.id === leaveId ? { ...l, status } : l))
-          }));
-        }
-      },
-
-      generatePayslip: async (payrollData) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.GENERATE_PAYSLIP, payrollData);
-          get().fetchAllData();
-          return res;
-        } catch (err) {
-          console.error('Failed to generate payslip on backend:', err);
-          const expenseEntry = {
-            id: Date.now() + 1,
-            date: new Date().toISOString().split('T')[0],
-            category: 'Staff Cost',
-            amount: payrollData.netPay,
-            description: `Salary for ${payrollData.staffName} (${payrollData.month} ${payrollData.year})`
-          };
-          set((state) => ({
-            payrolls: [{ id: 'PR' + Date.now(), ...payrollData, paymentDate: new Date().toISOString() }, ...state.payrolls],
-            expenses: [expenseEntry, ...state.expenses]
-          }));
-        }
-      },
-
-      // SMS
-      addSmsToHistory: async (smsData) => {
-        try {
-          const res = await apiClient.post(ENDPOINTS.SMS_SEND, {
-            message: smsData.message,
-            customerIds: smsData.receivers?.map((r) => r.id) || smsData.selectedCustomers || [],
-            numbers: smsData.numbers || []
-          });
-          get().fetchAllData();
-          return res;
-        } catch (err) {
-          console.error('Failed to send SMS on backend:', err);
-          set((state) => ({
-            smsHistory: [{ id: 'SMS' + Date.now(), date: new Date().toISOString(), ...smsData }, ...state.smsHistory]
-          }));
-        }
-      },
-
-      // Compatibility helper
-      loadDummyData: () => {
-        get().fetchAllData();
-      }
     }),
     {
-      name: 'retail-shop-storage',
-      partialize: (state) => ({
-        user: state.user,
-        token: state.token,
-        theme: state.theme,
-        activeThemeClass: state.activeThemeClass,
-        cart: state.cart,
-      }),
+      name: 'retail-shop-storage', // key in localStorage
     }
   )
 );
