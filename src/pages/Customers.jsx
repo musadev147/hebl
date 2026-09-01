@@ -117,10 +117,10 @@ const Customers = () => {
 
     if (activeTab === 'Customer') {
       settleCustomerDue(settleModal.target.id, amount, settleModal.date);
-      alert(`Successfully settled ৳${amount} for Customer: ${settleModal.target.name}`);
+      alert(`Successfully settled ${amount} for Customer: ${settleModal.target.name}`);
     } else {
       settleSupplierDue(settleModal.target.id, amount, settleModal.date);
-      alert(`Successfully settled ৳${amount} for Supplier: ${settleModal.target.name}`);
+      alert(`Successfully settled ${amount} for Supplier: ${settleModal.target.name}`);
     }
 
     setSettleModal({ show: false, target: null, amount: '', date: '' });
@@ -198,7 +198,7 @@ const Customers = () => {
                     <td>{person.id}</td>
                     <td>{person.name}</td>
                     <td className="flex-align-gap"><Phone size={14} className="text-muted" /> {person.phone}</td>
-                    <td><span className="text-danger font-bold">৳{person.due}</span></td>
+                    <td><span className="text-danger font-bold">{person.due}</span></td>
                     <td>
                       <div className="action-buttons flex-align-gap" style={{flexWrap:'nowrap'}}>
                         <button className="btn-icon" title="View & Print" onClick={() => setSelectedPerson(person)}>
@@ -208,7 +208,7 @@ const Customers = () => {
                         {activeTab === 'Customer' && (
                           <button 
                             className="btn-primary flex-align-gap" style={{padding:'0.2rem 0.5rem', fontSize:'0.8rem'}}
-                            onClick={() => setSmsModal({ show: true, target: person, message: `Dear ${person.name}, your due amount is ৳${person.due}. Please settle your account.` })}
+                            onClick={() => setSmsModal({ show: true, target: person, message: `Dear ${person.name}, your due amount is ${person.due}. Please settle your account.` })}
                           >
                             <MessageSquare size={14} /> SMS
                           </button>
@@ -246,7 +246,7 @@ const Customers = () => {
                   <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{person.id}</td>
                   <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{person.name}</td>
                   <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{person.phone}</td>
-                  <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>৳{person.due.toLocaleString()}</td>
+                  <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>{person.due.toLocaleString()}</td>
                 </tr>
               )) : (
                 <tr>
@@ -258,7 +258,7 @@ const Customers = () => {
               <tr style={{ background: '#f8f9fa', fontWeight: 'bold' }}>
                 <td colSpan="3" style={{border: '1px solid #ccc', padding: '0.5rem', textAlign: 'right'}}>Total Due:</td>
                 <td style={{border: '1px solid #ccc', padding: '0.5rem', textAlign: 'right', color: 'red'}}>
-                  ৳{filteredList.reduce((sum, item) => sum + item.due, 0).toLocaleString()}
+                  {filteredList.reduce((sum, item) => sum + Number(item.due || 0), 0).toLocaleString()}
                 </td>
               </tr>
             </tfoot>
@@ -286,7 +286,7 @@ const Customers = () => {
                   </div>
                   <div>
                     <label className="text-muted text-sm block mb-1">Current Due (BDT)</label>
-                    <p className="font-bold text-danger text-lg">৳{settleModal.target?.due}</p>
+                    <p className="font-bold text-danger text-lg">{settleModal.target?.due}</p>
                   </div>
                   <div>
                     <label className="text-muted text-sm block mb-1">Settlement Amount (BDT)</label>
@@ -405,7 +405,7 @@ const Customers = () => {
                              {tx.type === 'payment' ? `৳${tx.amount.toLocaleString()}` : '-'}
                            </td>
                            <td style={{ border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right', fontWeight: 'bold' }}>
-                             ৳{Math.max(0, tx.balance).toLocaleString()}
+                             {Math.max(0, tx.balance).toLocaleString()}
                            </td>
                          </tr>
                        ))
@@ -418,7 +418,7 @@ const Customers = () => {
                  </table>
 
                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
-                   <p style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'red' }}><strong>Current Due:</strong> ৳{selectedPerson.due.toLocaleString()}</p>
+                   <p style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'red' }}><strong>Current Due:</strong> {selectedPerson.due.toLocaleString()}</p>
                  </div>
                  <PrintFooter />
               </div>

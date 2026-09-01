@@ -13,7 +13,11 @@ const Reports = () => {
   const [endDate, setEndDate] = useState('');
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [invoiceType, setInvoiceType] = useState(''); // 'Sale' or 'Purchase'
-  const { sales, inventory, purchases, expenses, customers, suppliers, staff, payrolls, returns, attendance, leaves, loadDummyData } = useStore();
+  const { sales = [], inventory = [], purchases = [], expenses = [], customers = [], suppliers = [], staff = [], payrolls = [], returns = [], attendance = [], leaves = [], fetchAllData, loadDummyData } = useStore();
+
+  React.useEffect(() => {
+    if (fetchAllData) fetchAllData();
+  }, []);
 
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
@@ -45,12 +49,12 @@ const Reports = () => {
 
   // 1. Sales Report Data
   const filteredSales = sales.filter(s => isWithinFilter(s.date));
-  const totalSalesAmount = filteredSales.reduce((acc, s) => acc + s.total, 0);
+  const totalSalesAmount = filteredSales.reduce((acc, s) => acc + Number(s.total || 0), 0);
   const totalInvoices = filteredSales.length;
 
   // 1.5 Purchase Report Data
   const filteredPurchases = purchases.filter(p => isWithinFilter(p.date));
-  const totalPurchasesCost = filteredPurchases.reduce((acc, p) => acc + p.total, 0);
+  const totalPurchasesCost = filteredPurchases.reduce((acc, p) => acc + Number(p.total || 0), 0);
   const totalPurchaseInvoices = filteredPurchases.length;
 
   // 2. Stock Report Data
@@ -74,45 +78,53 @@ const Reports = () => {
 
   // 3. Profit & Loss Data
   const filteredExpenses = expenses.filter(e => isWithinFilter(e.date));
-  const totalExpenseCost = filteredExpenses.reduce((acc, e) => acc + e.amount, 0);
+  const totalExpenseCost = filteredExpenses.reduce((acc, e) => acc + Number(e.amount || 0), 0);
   const totalCost = totalPurchasesCost + totalExpenseCost;
   const netProfit = totalSalesAmount - totalCost;
 
-  // Prepare Profit & Loss Detailed Ledger
+    // Prepare Profit & Loss Detailed Ledger
   let currentBalance = 0;
   const profitLossDetails = [
     ...filteredSales.map(s => ({
-      id: s.id,
+      id: s.id || ('S_' + Math.random()),
       date: s.date,
       type: 'Sale (Revenue)',
-      amount: s.total,
+      amount: parseFloat(s.total || s.grand_total || 0) || 0,
       isRevenue: true
     })),
     ...filteredPurchases.map(p => ({
-      id: p.id,
+      id: p.id || ('P_' + Math.random()),
       date: p.date,
       type: 'Purchase (Cost)',
-      amount: p.total,
+      amount: parseFloat(p.total || p.total_amount || 0) || 0,
       isRevenue: false
     })),
     ...filteredExpenses.map(e => ({
-      id: e.id || 'EXP' + Date.now() + Math.random(),
+      id: e.id || ('EXP_' + Math.random()),
       date: e.date,
-      type: `Expense (${e.category})`,
-      amount: e.amount,
+      type: `Expense (${e.category || 'General'})`,
+      amount: parseFloat(e.amount || 0) || 0,
       isRevenue: false
     }))
-  ].sort((a, b) => new Date(a.date) - new Date(b.date)).map(item => {
-    if (item.isRevenue) currentBalance += item.amount;
-    else currentBalance -= item.amount;
-    return { ...item, balance: currentBalance };
+  ].sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0)).map(item => {
+    const numAmt = parseFloat(item.amount) || 0;
+    if (item.isRevenue) {
+      currentBalance += numAmt;
+    } else {
+      currentBalance -= numAmt;
+    }
+    return { 
+      ...item, 
+      amount: numAmt, 
+      balance: Math.round(currentBalance * 100) / 100 
+    };
   });
 
   // 4. Due Report Data
   const dueCustomers = customers.filter(c => c.due > 0);
   const dueSuppliers = suppliers.filter(s => s.due > 0);
-  const totalCustomerDue = dueCustomers.reduce((acc, c) => acc + c.due, 0);
-  const totalSupplierDue = dueSuppliers.reduce((acc, s) => acc + s.due, 0);
+  const totalCustomerDue = dueCustomers.reduce((acc, c) => acc + Number(c.due || 0), 0);
+  const totalSupplierDue = dueSuppliers.reduce((acc, s) => acc + Number(s.due || 0), 0);
 
   // 5. Salesman-wise Report
   const salesmanData = {};
@@ -127,14 +139,15 @@ const Reports = () => {
   // 6. Expense Report Data
   const expenseByCategory = {};
   filteredExpenses.forEach(e => {
-    if (!expenseByCategory[e.category]) expenseByCategory[e.category] = 0;
-    expenseByCategory[e.category] += e.amount;
+    const cat = e.category || 'General';
+    if (!expenseByCategory[cat]) expenseByCategory[cat] = 0;
+    expenseByCategory[cat] += Number(e.amount || 0);
   });
 
   // 7. HR & Payroll Report Data
   const filteredPayrolls = payrolls.filter(p => isWithinFilter(p.paymentDate || p.month));
-  const totalSalaryPaid = filteredPayrolls.reduce((acc, p) => acc + p.netPay, 0);
-  const totalBonusPaid = filteredPayrolls.reduce((acc, p) => acc + p.bonus, 0);
+  const totalSalaryPaid = filteredPayrolls.reduce((acc, p) => acc + Number(p.netPay || 0), 0);
+  const totalBonusPaid = filteredPayrolls.reduce((acc, p) => acc + Number(p.bonus || 0), 0);
 
   const TABS = [
     { id: 'Sales', label: 'Sales', icon: BarChart },
@@ -165,7 +178,7 @@ const Reports = () => {
       }
     });
   });
-  const totalGiftValue = giftItems.reduce((acc, g) => acc + g.value, 0);
+  const totalGiftValue = giftItems.reduce((acc, g) => acc + Number(g.value || 0), 0);
 
   return (
     <div className="reports-page animate-fade-in" id="reports-page-container">
@@ -190,8 +203,8 @@ const Reports = () => {
             </div>
           )}
           {sales.length === 0 && (
-            <button className="btn-secondary flex-align-gap" onClick={loadDummyData}>
-              <Database size={18} /> Load Dummy Data
+            <button className="btn-secondary flex-align-gap" onClick={() => { if (fetchAllData) fetchAllData(); else if (loadDummyData) loadDummyData(); }}>
+              <Database size={18} /> Sync Live Data
             </button>
           )}
           <button className="btn-primary flex-align-gap" onClick={() => window.print()}>
@@ -220,7 +233,7 @@ const Reports = () => {
           <div className="grid responsive-grid-2 mt-4 mb-4">
              <div className="card bg-input text-center">
                <h4 className="text-muted">Total Revenue</h4>
-               <p className="text-2xl text-primary font-bold">৳{totalSalesAmount.toLocaleString()}</p>
+               <p className="text-2xl text-primary font-bold">{totalSalesAmount.toLocaleString()}</p>
              </div>
              <div className="card bg-input text-center">
                <h4 className="text-muted">Invoices Generated</h4>
@@ -233,7 +246,7 @@ const Reports = () => {
               <tbody>
                 {filteredSales.map(s => (
                   <tr key={s.id}>
-                    <td>{s.id}</td><td>{s.date.split('T')[0]}</td><td>{s.customerName}</td><td>{s.items.length}</td><td className="text-primary font-bold">৳{s.total.toLocaleString()}</td>
+                    <td>{s.id}</td><td>{s.date.split('T')[0]}</td><td>{s.customerName}</td><td>{s.items.length}</td><td className="text-primary font-bold">{s.total.toLocaleString()}</td>
                     <td style={{textAlign:'center'}}>
                       <div className="flex-align-gap" style={{justifyContent:'center'}}>
                         <button className="btn-icon" title="View & Print" onClick={() => { setSelectedInvoice(s); setInvoiceType('Sale'); }}>
@@ -257,7 +270,7 @@ const Reports = () => {
           <div className="grid responsive-grid-2 mt-4 mb-4">
              <div className="card bg-input text-center">
                <h4 className="text-muted">Total Purchase Cost</h4>
-               <p className="text-2xl text-danger font-bold">৳{totalPurchasesCost.toLocaleString()}</p>
+               <p className="text-2xl text-danger font-bold">{totalPurchasesCost.toLocaleString()}</p>
              </div>
              <div className="card bg-input text-center">
                <h4 className="text-muted">Invoices Generated</h4>
@@ -270,7 +283,7 @@ const Reports = () => {
               <tbody>
                 {filteredPurchases.map(p => (
                   <tr key={p.id}>
-                    <td>{p.id}</td><td>{p.date.split('T')[0]}</td><td>{p.supplierName}</td><td>{p.items.reduce((acc, i) => acc + i.quantity, 0)}</td><td className="text-danger font-bold">৳{p.total.toLocaleString()}</td>
+                    <td>{p.id}</td><td>{p.date.split('T')[0]}</td><td>{p.supplierName}</td><td>{p.items.reduce((acc, i) => acc + i.quantity, 0)}</td><td className="text-danger font-bold">{p.total.toLocaleString()}</td>
                     <td style={{textAlign:'center'}}>
                       <div className="flex-align-gap" style={{justifyContent:'center'}}>
                         <button className="btn-icon" title="View & Print" onClick={() => { setSelectedInvoice(p); setInvoiceType('Purchase'); }}>
@@ -325,15 +338,15 @@ const Reports = () => {
           <div className="grid responsive-grid-3 mt-4 mb-4">
              <div className="card bg-input text-center">
                <h4 className="text-muted">Total Revenue</h4>
-               <p className="text-2xl text-primary font-bold">৳{totalSalesAmount.toLocaleString()}</p>
+               <p className="text-2xl text-primary font-bold">{totalSalesAmount.toLocaleString()}</p>
              </div>
              <div className="card bg-input text-center">
                <h4 className="text-muted">Total Cost (Purchases + Expense)</h4>
-               <p className="text-2xl text-danger font-bold">৳{totalCost.toLocaleString()}</p>
+               <p className="text-2xl text-danger font-bold">{totalCost.toLocaleString()}</p>
              </div>
              <div className="card bg-input text-center" style={{ border: `1px solid ${netProfit >= 0 ? 'var(--success)' : 'var(--danger)'}` }}>
                <h4 className="text-muted">Net Profit</h4>
-               <p className={`text-2xl font-bold ${netProfit >= 0 ? 'text-success' : 'text-danger'}`}>৳{netProfit.toLocaleString()}</p>
+               <p className={`text-2xl font-bold ${netProfit >= 0 ? 'text-success' : 'text-danger'}`}>{netProfit.toLocaleString()}</p>
              </div>
           </div>
           
@@ -352,17 +365,19 @@ const Reports = () => {
               <tbody>
                 {profitLossDetails.length > 0 ? (
                   profitLossDetails.map((item, idx) => (
-                    <tr key={item.id + idx}>
+                    <tr key={item.id + '_' + idx}>
                       <td>{new Date(item.date).toLocaleDateString()}</td>
-                      <td>{item.type}</td>
-                      <td style={{ textAlign: 'right', color: item.isRevenue ? '#10b981' : 'inherit', fontWeight: item.isRevenue ? 'bold' : 'normal' }}>
-                        {item.isRevenue ? `+৳${item.amount.toLocaleString()}` : '-'}
+                      <td style={{ fontWeight: '500' }}>{item.type}</td>
+                      <td style={{ textAlign: 'right', color: '#10b981', fontWeight: item.isRevenue ? 'bold' : 'normal' }}>
+                        {item.isRevenue ? `+৳${Number(item.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}
                       </td>
-                      <td style={{ textAlign: 'right', color: !item.isRevenue ? 'red' : 'inherit', fontWeight: !item.isRevenue ? 'bold' : 'normal' }}>
-                        {!item.isRevenue ? `-৳${item.amount.toLocaleString()}` : '-'}
+                      <td style={{ textAlign: 'right', color: '#ef4444', fontWeight: !item.isRevenue ? 'bold' : 'normal' }}>
+                        {!item.isRevenue ? `-৳${Number(item.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}
                       </td>
-                      <td style={{ textAlign: 'right', fontWeight: 'bold' }}>
-                        ৳{item.balance.toLocaleString()}
+                      <td style={{ textAlign: 'right', fontWeight: 'bold', color: item.balance >= 0 ? '#10b981' : '#ef4444' }}>
+                        {item.balance >= 0 
+                          ? `৳${Number(item.balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+                          : `-৳${Number(Math.abs(item.balance)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                       </td>
                     </tr>
                   ))
@@ -382,12 +397,12 @@ const Reports = () => {
         <div className="grid responsive-grid-2" style={{ gap: '1.5rem' }}>
           <div className="card glass">
             <h3 className="text-success mb-2">To Receive (Customer Due)</h3>
-            <p className="text-2xl font-bold mb-4">৳{totalCustomerDue.toLocaleString()}</p>
+            <p className="text-2xl font-bold mb-4">{totalCustomerDue.toLocaleString()}</p>
             <div className="table-responsive">
               <table className="data-table">
                 <thead><tr><th>Customer Name</th><th>Phone</th><th>Due Amount</th><th style={{textAlign:'center'}}>Actions</th></tr></thead>
                 <tbody>
-                  {dueCustomers.map(c => <tr key={c.id}><td>{c.name}</td><td>{c.phone}</td><td className="text-warning font-bold">৳{c.due.toLocaleString()}</td>
+                  {dueCustomers.map(c => <tr key={c.id}><td>{c.name}</td><td>{c.phone}</td><td className="text-warning font-bold">{c.due.toLocaleString()}</td>
                     <td style={{textAlign:'center'}}>
                       <div className="flex-align-gap" style={{justifyContent:'center'}}>
                         <button className="btn-icon" title="View & Print" onClick={() => { setSelectedInvoice(c); setInvoiceType('Customer Due'); }}>
@@ -403,12 +418,12 @@ const Reports = () => {
           </div>
           <div className="card glass">
             <h3 className="text-danger mb-2">To Pay (Supplier Due)</h3>
-            <p className="text-2xl font-bold mb-4">৳{totalSupplierDue.toLocaleString()}</p>
+            <p className="text-2xl font-bold mb-4">{totalSupplierDue.toLocaleString()}</p>
             <div className="table-responsive">
               <table className="data-table">
                 <thead><tr><th>Supplier Name</th><th>Phone</th><th>Due Amount</th><th style={{textAlign:'center'}}>Actions</th></tr></thead>
                 <tbody>
-                  {dueSuppliers.map(s => <tr key={s.id}><td>{s.name}</td><td>{s.phone}</td><td className="text-danger font-bold">৳{s.due.toLocaleString()}</td>
+                  {dueSuppliers.map(s => <tr key={s.id}><td>{s.name}</td><td>{s.phone}</td><td className="text-danger font-bold">{s.due.toLocaleString()}</td>
                     <td style={{textAlign:'center'}}>
                       <div className="flex-align-gap" style={{justifyContent:'center'}}>
                         <button className="btn-icon" title="View & Print" onClick={() => { setSelectedInvoice(s); setInvoiceType('Supplier Due'); }}>
@@ -437,7 +452,7 @@ const Reports = () => {
                   <tr key={sm}>
                     <td>{sm}</td>
                     <td>{salesmanData[sm].count}</td>
-                    <td className="text-primary font-bold">৳{salesmanData[sm].total.toLocaleString()}</td>
+                    <td className="text-primary font-bold">{salesmanData[sm].total.toLocaleString()}</td>
                     <td style={{textAlign:'center'}}>
                       <div className="flex-align-gap" style={{justifyContent:'center'}}>
                         <button className="btn-icon" title="View & Print" onClick={() => { setSelectedInvoice({ name: sm, ...salesmanData[sm] }); setInvoiceType('Salesman'); }}>
@@ -458,7 +473,7 @@ const Reports = () => {
       {activeTab === 'Expense' && (
         <div className="card glass">
           <h3>Expense Report ({dateFilter})</h3>
-          <p className="text-2xl text-danger font-bold mb-4 mt-2">Total: ৳{totalExpenseCost.toLocaleString()}</p>
+          <p className="text-2xl text-danger font-bold mb-4 mt-2">Total: {totalExpenseCost.toLocaleString()}</p>
           <div className="table-responsive">
             <table className="data-table">
               <thead><tr><th>Category</th><th>Total Amount</th><th style={{textAlign:'center'}}>Actions</th></tr></thead>
@@ -466,7 +481,7 @@ const Reports = () => {
                 {Object.keys(expenseByCategory).map(cat => (
                   <tr key={cat}>
                     <td>{cat}</td>
-                    <td className="text-danger font-bold">৳{expenseByCategory[cat].toLocaleString()}</td>
+                    <td className="text-danger font-bold">{expenseByCategory[cat].toLocaleString()}</td>
                     <td style={{textAlign:'center'}}>
                       <div className="flex-align-gap" style={{justifyContent:'center'}}>
                         <button className="btn-icon" title="View & Print" onClick={() => { setSelectedInvoice({ category: cat, amount: expenseByCategory[cat] }); setInvoiceType('Expense'); }}>
@@ -490,11 +505,11 @@ const Reports = () => {
           <div className="grid responsive-grid-2 mt-4 mb-4">
              <div className="card bg-input text-center">
                <h4 className="text-muted">Total Salary Paid</h4>
-               <p className="text-2xl text-warning font-bold">৳{totalSalaryPaid.toLocaleString()}</p>
+               <p className="text-2xl text-warning font-bold">{totalSalaryPaid.toLocaleString()}</p>
              </div>
              <div className="card bg-input text-center">
                <h4 className="text-muted">Total Bonus Paid</h4>
-               <p className="text-2xl text-success font-bold">৳{totalBonusPaid.toLocaleString()}</p>
+               <p className="text-2xl text-success font-bold">{totalBonusPaid.toLocaleString()}</p>
              </div>
           </div>
           <div className="table-responsive">
@@ -505,8 +520,8 @@ const Reports = () => {
                   <tr key={p.id}>
                     <td>{p.staffName}</td>
                     <td>{p.month}</td>
-                    <td className="font-bold">৳{p.netPay.toLocaleString()}</td>
-                    <td>৳{p.bonus.toLocaleString()}</td>
+                    <td className="font-bold">{p.netPay.toLocaleString()}</td>
+                    <td>{p.bonus.toLocaleString()}</td>
                     <td>{p.paymentDate.split('T')[0]}</td>
                     <td style={{textAlign:'center'}}>
                       <div className="flex-align-gap" style={{justifyContent:'center'}}>
@@ -535,7 +550,7 @@ const Reports = () => {
              </div>
              <div className="card bg-input text-center">
                <h4 className="text-muted">Total Gift Value</h4>
-               <p className="text-2xl text-primary font-bold">৳{totalGiftValue.toLocaleString()}</p>
+               <p className="text-2xl text-primary font-bold">{totalGiftValue.toLocaleString()}</p>
              </div>
           </div>
           <div className="table-responsive">
@@ -561,7 +576,7 @@ const Reports = () => {
                     </td>
                     <td>{g.itemName}</td>
                     <td>{g.quantity}</td>
-                    <td>৳{g.value.toLocaleString()}</td>
+                    <td>{g.value.toLocaleString()}</td>
                   </tr>
                 )) : (
                   <tr><td colSpan="6" className="text-center text-muted">No gifts found in this period.</td></tr>
@@ -607,14 +622,14 @@ const Reports = () => {
                         <tbody>
                           {selectedInvoice.items.map((item, idx) => (
                             <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
-                              <td style={{ padding: '0.75rem 0' }}>{item.name} <br/> <small style={{ color: '#666' }}>{item.quantity} x ৳{item.price}</small></td>
-                              <td style={{textAlign: 'right', padding: '0.75rem 0'}}>৳{item.price * item.quantity}</td>
+                              <td style={{ padding: '0.75rem 0' }}>{item.name} <br/> <small style={{ color: '#666' }}>{item.quantity} x {item.price}</small></td>
+                              <td style={{textAlign: 'right', padding: '0.75rem 0'}}>{item.price * item.quantity}</td>
                             </tr>
                           ))}
                         </tbody>
                      </table>
                      <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: '#000' }}>
-                        <span>Total {invoiceType}:</span><span>৳{selectedInvoice.total}</span>
+                        <span>Total {invoiceType}:</span><span>{selectedInvoice.total}</span>
                      </div>
                    </>
                  )}
@@ -623,10 +638,10 @@ const Reports = () => {
                    <div style={{ fontSize: '0.9rem', color: '#333', lineHeight: '2' }}>
                      <p><strong>Staff Name:</strong> {selectedInvoice.staffName}</p>
                      <p><strong>Month:</strong> {selectedInvoice.month}</p>
-                     <p><strong>Net Salary:</strong> ৳{selectedInvoice.netPay.toLocaleString()}</p>
-                     <p><strong>Bonus:</strong> ৳{selectedInvoice.bonus.toLocaleString()}</p>
+                     <p><strong>Net Salary:</strong> {selectedInvoice.netPay.toLocaleString()}</p>
+                     <p><strong>Bonus:</strong> {selectedInvoice.bonus.toLocaleString()}</p>
                      <hr style={{ margin: '1rem 0', borderColor: '#eee' }} />
-                     <p style={{ fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: '#000' }}><strong>Total Paid:</strong> ৳{(selectedInvoice.netPay + selectedInvoice.bonus).toLocaleString()}</p>
+                     <p style={{ fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: '#000' }}><strong>Total Paid:</strong> {(selectedInvoice.netPay + selectedInvoice.bonus).toLocaleString()}</p>
                    </div>
                  )}
 
@@ -635,7 +650,7 @@ const Reports = () => {
                      <p><strong>Name:</strong> {selectedInvoice.name}</p>
                      <p><strong>Phone:</strong> {selectedInvoice.phone}</p>
                      <hr style={{ margin: '1rem 0', borderColor: '#eee' }} />
-                     <p style={{ fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: 'red' }}><strong>Total Due:</strong> ৳{selectedInvoice.due.toLocaleString()}</p>
+                     <p style={{ fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: 'red' }}><strong>Total Due:</strong> {selectedInvoice.due.toLocaleString()}</p>
                    </div>
                  )}
 
@@ -672,14 +687,14 @@ const Reports = () => {
                                 <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{new Date(sale.date).toLocaleDateString()}</td>
                                 <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{sale.id}</td>
                                 <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{sale.customerInfo?.name || sale.customerName || 'N/A'}</td>
-                                <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>৳{sale.total.toLocaleString()}</td>
+                                <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>{sale.total.toLocaleString()}</td>
                              </tr>
                            ))}
                         </tbody>
                      </table>
 
                      <div style={{ textAlign: 'right', fontWeight: 'bold', fontSize: '1.1rem', marginTop: '1rem', color: '#000' }}>
-                        Grand Total Sales: ৳{selectedInvoice.total.toLocaleString()}
+                        Grand Total Sales: {selectedInvoice.total.toLocaleString()}
                      </div>
                    </div>
                  )}
@@ -688,7 +703,7 @@ const Reports = () => {
                    <div style={{ fontSize: '0.9rem', color: '#333', lineHeight: '2' }}>
                      <p><strong>Category:</strong> {selectedInvoice.category}</p>
                      <hr style={{ margin: '1rem 0', borderColor: '#eee' }} />
-                     <p style={{ fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: 'red' }}><strong>Total Expense:</strong> ৳{selectedInvoice.amount.toLocaleString()}</p>
+                     <p style={{ fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: 'red' }}><strong>Total Expense:</strong> {selectedInvoice.amount.toLocaleString()}</p>
                    </div>
                  )}
                  <PrintFooter />

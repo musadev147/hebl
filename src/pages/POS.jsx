@@ -161,7 +161,7 @@ const POS = () => {
                 }}
                 onClick={() => addToCart({ ...item, isGift: false, itemDiscount: 0 })}
               >
-                {item.name} (৳{item.price})
+                {item.name} ({item.price})
               </button>
             ))
           )}
@@ -175,7 +175,7 @@ const POS = () => {
               <div className="cart-item glass" key={item.id}>
                 <div className="item-info">
                   <h4>{item.name}</h4>
-                  <span className="text-muted">ID: {item.id} | ৳{item.price} x {item.quantity}</span>
+                  <span className="text-muted">ID: {item.id} | {item.price} x {item.quantity}</span>
                 </div>
                 <div className="item-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   <div className="quantity-control" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'var(--bg-input)', padding: '0.25rem', borderRadius: 'var(--radius-full)', border: '1px solid var(--border-color)' }}>
@@ -216,7 +216,7 @@ const POS = () => {
                     <Gift size={18} strokeWidth={item.isGift ? 2.5 : 1.5} />
                   </button>
                   <div className="item-price" style={{ minWidth: '80px', textAlign: 'right', fontWeight: 'bold' }}>
-                    ৳{item.isGift ? 0 : ((item.price - (item.itemDiscount || 0)) * item.quantity)}
+                    {item.isGift ? 0 : ((item.price - (item.itemDiscount || 0)) * item.quantity)}
                   </div>
                   <button className="btn-icon text-danger" onClick={() => removeFromCart(item.id)}>
                     <Trash2 size={18} />
@@ -290,7 +290,7 @@ const POS = () => {
         <div className="checkout-section summary-section">
           <div className="summary-row">
             <span>Subtotal</span>
-            <span>৳{subtotal}</span>
+            <span>{subtotal}</span>
           </div>
           <div className="summary-row">
             <span>Invoice Discount</span>
@@ -304,7 +304,7 @@ const POS = () => {
           </div>
           <div className="summary-row total-row">
             <span>Total Payable</span>
-            <span className="text-primary text-xl">৳{total}</span>
+            <span className="text-primary text-xl">{total}</span>
           </div>
         </div>
 
@@ -408,7 +408,7 @@ const POS = () => {
                   <td>{s.customerName || 'N/A'}</td>
                   <td>{s.items.length} items</td>
                   <td><span className={`badge ${s.paymentType === 'Cash' ? 'bg-success' : 'bg-warning'}`}>{s.paymentType}</span></td>
-                  <td className="text-primary font-bold">৳{s.total.toLocaleString()}</td>
+                  <td className="text-primary font-bold">{s.total.toLocaleString()}</td>
                   <td style={{textAlign:'center'}}>
                     <div className="flex-align-gap" style={{justifyContent:'center'}}>
                       <button className="btn-icon" title="View & Print" onClick={() => setSelectedInvoice(s)}>
@@ -457,13 +457,13 @@ const POS = () => {
                         )}
                         <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{item.name}</td>
                         <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'center'}}>{item.quantity}</td>
-                        <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>৳{item.price}</td>
-                        <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>৳{item.price * item.quantity}</td>
+                        <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>{item.price}</td>
+                        <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>{item.price * item.quantity}</td>
                       </tr>
                     ))}
                     <tr style={{ background: '#f8f9fa' }}>
                       <td colSpan="7" style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right', fontWeight: 'bold'}}>Invoice {sale.id} Total:</td>
-                      <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right', fontWeight: 'bold'}}>৳{sale.total}</td>
+                      <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right', fontWeight: 'bold'}}>{sale.total}</td>
                     </tr>
                   </React.Fragment>
                 ))}
@@ -471,7 +471,7 @@ const POS = () => {
             </table>
 
             <div style={{ textAlign: 'right', marginTop: '1.5rem', fontSize: '1.2rem', fontWeight: 'bold' }}>
-              Grand Total: ৳{filteredSales.reduce((acc, s) => acc + s.total, 0)}
+              Grand Total: {filteredSales.reduce((acc, s) => acc + Number(s.total || 0), 0)}
             </div>
             <PrintFooter />
           </div>

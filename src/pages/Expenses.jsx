@@ -32,7 +32,7 @@ const Expenses = () => {
 
   const [showReport, setShowReport] = useState(false);
   const [reportMonth, setReportMonth] = useState(new Date().toISOString().substring(0, 7));
-  const totalDailyExpense = expenses.filter(e => e.date === todayStr).reduce((acc, curr) => acc + curr.amount, 0);
+  const totalDailyExpense = expenses.filter(e => e.date === todayStr).reduce((acc, curr) => acc + Number(curr.amount || 0), 0);
 
   const handleAddExpense = (e) => {
     e.preventDefault();
@@ -46,10 +46,10 @@ const Expenses = () => {
 
   // Monthly Report Calculations
   const monthlyExpenses = expenses.filter(e => e.date && e.date.startsWith(reportMonth));
-  const totalMonthlyExpense = monthlyExpenses.reduce((acc, curr) => acc + curr.amount, 0);
+  const totalMonthlyExpense = monthlyExpenses.reduce((acc, curr) => acc + Number(curr.amount || 0), 0);
   const categoryTotals = EXPENSE_CATEGORIES.map(cat => ({
     category: cat,
-    amount: monthlyExpenses.filter(e => e.category === cat).reduce((acc, curr) => acc + curr.amount, 0)
+    amount: monthlyExpenses.filter(e => e.category === cat).reduce((acc, curr) => acc + Number(curr.amount || 0), 0)
   })).filter(c => c.amount > 0);
 
   // Add dynamically added categories like 'Staff Cost' if they exist in data but not in EXPENSE_CATEGORIES constant
@@ -57,7 +57,7 @@ const Expenses = () => {
   otherCategories.forEach(cat => {
     categoryTotals.push({
       category: cat,
-      amount: monthlyExpenses.filter(e => e.category === cat).reduce((acc, curr) => acc + curr.amount, 0)
+      amount: monthlyExpenses.filter(e => e.category === cat).reduce((acc, curr) => acc + Number(curr.amount || 0), 0)
     });
   });
 
@@ -79,7 +79,7 @@ const Expenses = () => {
              <h3 className="text-muted text-sm">Today's Expense</h3>
              <DollarSign className="text-danger" size={20} />
           </div>
-          <p className="text-xl font-bold mt-2 text-danger" style={{ fontSize: '1.5rem', marginTop: '0.5rem' }}>৳{totalDailyExpense.toLocaleString()}</p>
+          <p className="text-xl font-bold mt-2 text-danger" style={{ fontSize: '1.5rem', marginTop: '0.5rem' }}>{totalDailyExpense.toLocaleString()}</p>
         </div>
       </div>
       
@@ -123,7 +123,7 @@ const Expenses = () => {
                     <td>{exp.date}</td>
                     <td>{exp.category}</td>
                     <td>{exp.description}</td>
-                    <td className="text-danger font-bold">৳{exp.amount.toLocaleString()}</td>
+                    <td className="text-danger font-bold">{exp.amount.toLocaleString()}</td>
                     <td style={{textAlign:'center'}}>
                       <div className="flex-align-gap" style={{justifyContent:'center'}}>
                         <button className="btn-icon" title="View & Print" onClick={() => setSelectedExpense(exp)}>
@@ -165,7 +165,7 @@ const Expenses = () => {
                   <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{exp.date}</td>
                   <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{exp.category}</td>
                   <td style={{border: '1px solid #ccc', padding: '0.4rem'}}>{exp.description}</td>
-                  <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>৳{exp.amount.toLocaleString()}</td>
+                  <td style={{border: '1px solid #ccc', padding: '0.4rem', textAlign: 'right'}}>{exp.amount.toLocaleString()}</td>
                 </tr>
               )) : (
                 <tr>
@@ -177,7 +177,7 @@ const Expenses = () => {
               <tr style={{ background: '#f8f9fa', fontWeight: 'bold' }}>
                 <td colSpan="3" style={{border: '1px solid #ccc', padding: '0.5rem', textAlign: 'right'}}>Total Expense:</td>
                 <td style={{border: '1px solid #ccc', padding: '0.5rem', textAlign: 'right', color: 'red'}}>
-                  ৳{expenses.reduce((sum, item) => sum + item.amount, 0).toLocaleString()}
+                  {expenses.reduce((sum, item) => sum + Number(item.amount || 0), 0).toLocaleString()}
                 </td>
               </tr>
             </tfoot>
@@ -273,7 +273,7 @@ const Expenses = () => {
               <div id="printable-monthly-expense">
                 <div className="card bg-input" style={{ marginBottom: '1.5rem' }}>
                   <h3 className="text-muted text-sm text-center">Total Monthly Expense ({reportMonth})</h3>
-                  <p className="text-2xl font-bold mt-2 text-danger text-center">৳{totalMonthlyExpense.toLocaleString()}</p>
+                  <p className="text-2xl font-bold mt-2 text-danger text-center">{totalMonthlyExpense.toLocaleString()}</p>
                 </div>
 
                 <h4>Breakdown by Category</h4>
@@ -292,7 +292,7 @@ const Expenses = () => {
                         categoryTotals.map((cat, idx) => (
                           <tr key={idx}>
                             <td>{cat.category}</td>
-                            <td className="text-right font-bold text-danger">৳{cat.amount.toLocaleString()}</td>
+                            <td className="text-right font-bold text-danger">{cat.amount.toLocaleString()}</td>
                           </tr>
                         ))
                       )}
@@ -307,7 +307,7 @@ const Expenses = () => {
               <button className="btn-primary flex-align-gap w-full center-content" onClick={() => {
                  const printContents = document.getElementById('printable-monthly-expense').innerHTML;
                  const originalContents = document.body.innerHTML;
-                 document.body.innerHTML = `<div style="padding:2rem;color:#000;"><h2>Expense Report: ${reportMonth}</h2>${printContents}</div>`;
+                 document.body.innerHTML = `<div style="padding:2rem;color:#000;"><h2>Expense Report: ${reportMonth}</h2>৳{printContents}</div>`;
                  window.print();
                  document.body.innerHTML = originalContents;
                  window.location.reload(); 
@@ -348,7 +348,7 @@ const Expenses = () => {
                    <p><strong>Category:</strong> {selectedExpense.category}</p>
                    <p><strong>Description:</strong> {selectedExpense.description}</p>
                    <hr style={{ margin: '1rem 0', borderColor: '#eee' }} />
-                   <p style={{ fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: 'red' }}><strong>Amount:</strong> ৳{selectedExpense.amount.toLocaleString()}</p>
+                   <p style={{ fontWeight: 'bold', fontSize: '0.9rem', marginTop: '1rem', color: 'red' }}><strong>Amount:</strong> {selectedExpense.amount.toLocaleString()}</p>
                  </div>
                  <PrintFooter />
               </div>

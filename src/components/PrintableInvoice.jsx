@@ -11,13 +11,12 @@ const PrintableInvoice = ({ sale, customers }) => {
   // Find customer in store to get their due
   const customer = customers?.find(c => c.name === customerName || c.id === sale.customerId);
   
-  const totalQty = sale.items ? sale.items.reduce((acc, item) => acc + item.quantity, 0) : sale.cartItems?.reduce((acc, item) => acc + item.quantity, 0) || 0;
-  
-  const currentDue = sale.paymentType === 'Baki' ? sale.total : 0;
-  const overallDue = customer?.due || currentDue;
-  const actualPreviousDue = Math.max(0, overallDue - currentDue);
-
   const items = sale.items || sale.cartItems || [];
+  const totalQty = items.reduce((acc, item) => acc + Number(item.quantity || 0), 0);
+  
+  const currentDue = sale.paymentType === 'Baki' ? Number(sale.total || 0) : 0;
+  const overallDue = Number(customer?.due || currentDue);
+  const actualPreviousDue = Math.max(0, overallDue - currentDue);
 
   return (
     <div style={{ padding: '1.5rem', background: '#fff', color: '#000', fontFamily: 'Arial, sans-serif' }}>

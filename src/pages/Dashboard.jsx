@@ -17,7 +17,11 @@ const mockChartData = [
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const { user, sales, expenses, inventory, customers, suppliers, purchases } = useStore();
+  const { user, sales = [], expenses = [], inventory = [], customers = [], suppliers = [], purchases = [], fetchAllData } = useStore();
+
+  useEffect(() => {
+    if (fetchAllData) fetchAllData();
+  }, []);
   const isAdmin = user?.role === 'Admin';
 
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -31,31 +35,33 @@ const Dashboard = () => {
   const todayStr = new Date().toISOString().split('T')[0];
   const currentMonthStr = todayStr.substring(0, 7);
 
+  // Helper for safe numeric conversion
+  const num = (v) => (v !== null && v !== undefined && !isNaN(Number(v))) ? Number(v) : 0;
+
   // Sales
-  const dailySales = sales.filter(s => s.date && s.date.startsWith(todayStr)).reduce((acc, sale) => acc + sale.total, 0);
-  const monthlySales = sales.filter(s => s.date && s.date.startsWith(currentMonthStr)).reduce((acc, sale) => acc + sale.total, 0);
+  const dailySales = sales.filter(s => s.date && s.date.startsWith(todayStr)).reduce((acc, sale) => acc + num(sale.total), 0);
+  const monthlySales = sales.filter(s => s.date && s.date.startsWith(currentMonthStr)).reduce((acc, sale) => acc + num(sale.total), 0);
 
   // Expenses
-  const dailyExpenses = expenses.filter(e => e.date && e.date.startsWith(todayStr)).reduce((acc, exp) => acc + exp.amount, 0);
-  const monthlyExpenses = expenses.filter(e => e.date && e.date.startsWith(currentMonthStr)).reduce((acc, exp) => acc + exp.amount, 0);
+  const dailyExpenses = expenses.filter(e => e.date && e.date.startsWith(todayStr)).reduce((acc, exp) => acc + num(exp.amount), 0);
+  const monthlyExpenses = expenses.filter(e => e.date && e.date.startsWith(currentMonthStr)).reduce((acc, exp) => acc + num(exp.amount), 0);
 
   // Profit/Loss
   const dailyProfit = dailySales - dailyExpenses;
   const monthlyProfit = monthlySales - monthlyExpenses;
 
-  // Cash Balance Calculation (All time Cash Sales - All time Cash Purchases - All time Expenses + All time Customer Settlements - All time Supplier Settlements)
-  const allTimeCashSales = sales.filter(s => s.paymentType === 'Cash').reduce((acc, sale) => acc + sale.total, 0);
-  const allTimeCashPurchases = purchases.filter(p => p.paymentType === 'Cash').reduce((acc, p) => acc + p.total, 0);
-  const allTimeExpenses = expenses.reduce((acc, exp) => acc + exp.amount, 0);
+  // Cash Balance Calculation
+  const allTimeCashSales = sales.filter(s => s.paymentType === 'Cash').reduce((acc, sale) => acc + num(sale.total), 0);
+  const allTimeCashPurchases = purchases.filter(p => p.paymentType === 'Cash').reduce((acc, p) => acc + num(p.total), 0);
+  const allTimeExpenses = expenses.reduce((acc, exp) => acc + num(exp.amount), 0);
 
-  // Actually, we don't have settlements tracked fully in a way that distinguishes cash vs bank, but let's do a basic net balance.
-  const totalSales = sales.reduce((acc, sale) => acc + sale.total, 0);
-  const totalExpenses = expenses.reduce((acc, exp) => acc + exp.amount, 0);
-  const netBalance = totalSales - totalExpenses; // A simplified "Total Balance" for the business overall
+  const totalSales = sales.reduce((acc, sale) => acc + num(sale.total), 0);
+  const totalExpenses = expenses.reduce((acc, exp) => acc + num(exp.amount), 0);
+  const netBalance = totalSales - totalExpenses;
 
-  const totalInventoryValue = inventory.reduce((acc, item) => acc + (item.stock * item.price), 0);
-  const totalCustomerDue = customers.reduce((acc, cust) => acc + cust.due, 0);
-  const totalSupplierDue = suppliers.reduce((acc, sup) => acc + sup.due, 0);
+  const totalInventoryValue = inventory.reduce((acc, item) => acc + (num(item.stock) * num(item.price)), 0);
+  const totalCustomerDue = customers.reduce((acc, cust) => acc + num(cust.due), 0);
+  const totalSupplierDue = suppliers.reduce((acc, sup) => acc + num(sup.due), 0);
 
   // --- GRADIENT DESIGN (Commented out for now as requested) ---
   /*
@@ -74,7 +80,7 @@ const Dashboard = () => {
 
   // --- ACTIVE BORDER DESIGN ---
   const stats = [
-    { label: "Total Balance (Net)", value: `৳${netBalance.toLocaleString()}`, icon: DollarSign, color: "var(--success)", highlight: true },
+    { label: "Total Balance (Net)", value: `৳${netBalance.toLocaleString()}`, icon: DollarSign, color: netBalance >= 0 ? "var(--success)" : "var(--danger)", highlight: true },
     { label: "Today's Sales", value: `৳${dailySales.toLocaleString()}`, icon: ShoppingCart, color: "var(--primary)" },
     { label: "Today's Expense", value: `৳${dailyExpenses.toLocaleString()}`, icon: TrendingDown, color: "var(--danger)" },
     { label: "Today's Net Profit", value: `৳${dailyProfit.toLocaleString()}`, icon: TrendingUp, color: dailyProfit >= 0 ? "#10b981" : "var(--danger)" },
@@ -313,7 +319,7 @@ const Dashboard = () => {
                       <td style={{ fontWeight: '500' }}>{customer.name}</td>
                       <td>{customer.phone}</td>
                       <td style={{ textAlign: 'right', fontWeight: 'bold', color: 'var(--warning)' }}>
-                        ৳{customer.due.toLocaleString()}
+                        {customer.due.toLocaleString()}
                       </td>
                     </tr>
                   ))
@@ -352,7 +358,7 @@ const Dashboard = () => {
                       <td style={{ fontWeight: '500' }}>{supplier.name}</td>
                       <td>{supplier.phone}</td>
                       <td style={{ textAlign: 'right', fontWeight: 'bold', color: 'var(--danger)' }}>
-                        ৳{supplier.due.toLocaleString()}
+                        {supplier.due.toLocaleString()}
                       </td>
                     </tr>
                   ))
