@@ -27,9 +27,13 @@ const defaultUnits = [
 ];
 
 const Inventory = () => {
+<<<<<<< HEAD
   const { inventory, categories, units, addInventoryItem, deleteInventoryItem, addCategory, addUnit } = useStore();
   
   // Filters State
+=======
+  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } = useStore();
+>>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('All');
   const [filterStock, setFilterStock] = useState('All');
@@ -43,12 +47,17 @@ const Inventory = () => {
   const [showCatModal, setShowCatModal] = useState(false);
   const [showUnitModal, setShowUnitModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+<<<<<<< HEAD
   const [printQuantity, setPrintQuantity] = useState(21);
 
   // New Category / Unit Inputs
   const [newCatInput, setNewCatInput] = useState('');
   const [newUnitInput, setNewUnitInput] = useState('');
   const [isCustomCategory, setIsCustomCategory] = useState(false);
+=======
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [printQuantity, setPrintQuantity] = useState(21); // Default to 21 (3x7 grid)
+>>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
 
   const [newProduct, setNewProduct] = useState({
     id: '', name: '', category: 'Power Tools', unit: 'Pcs', variant: '', stock: 0, price: 0
@@ -66,6 +75,7 @@ const Inventory = () => {
     }
   }, [location.search]);
 
+<<<<<<< HEAD
   // Merge Store Categories & Units with Defaults
   const allCategories = Array.from(new Set([
     ...defaultCategories,
@@ -78,12 +88,16 @@ const Inventory = () => {
   ]));
 
   const handleAddProduct = async (e) => {
+=======
+  const handleSaveProduct = (e) => {
+>>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
     e.preventDefault();
     if (!newProduct.id || !newProduct.name) {
       alert('Product ID and Name are required!');
       return;
     }
     
+<<<<<<< HEAD
     await addInventoryItem(newProduct);
     setShowAddModal(false);
     navigate('/inventory');
@@ -103,6 +117,27 @@ const Inventory = () => {
     if (!newUnitInput.trim()) return;
     await addUnit(newUnitInput.trim());
     setNewUnitInput('');
+=======
+    if (editingProduct) {
+      updateInventoryItem(editingProduct.id, newProduct);
+    } else {
+      addInventoryItem(newProduct);
+    }
+    
+    closeModal();
+  };
+
+  const openEditModal = (product) => {
+    setEditingProduct(product);
+    setNewProduct({ ...product });
+    setShowAddModal(true);
+  };
+
+  const closeModal = () => {
+    setShowAddModal(false);
+    setEditingProduct(null);
+    setNewProduct({ id: '', name: '', category: 'Grocery', unit: 'Bag', variant: '', stock: 0, price: 0 });
+>>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
   };
 
   const handlePrintBarcode = (product) => {
@@ -444,12 +479,20 @@ const Inventory = () => {
                       <button className="btn-icon" title="Print Barcode" onClick={() => handlePrintBarcode(item)}>
                         <Printer size={16} />
                       </button>
+<<<<<<< HEAD
                       <button className="btn-icon" title="Delete Product" onClick={() => {
                         if (confirm(`Are you sure you want to delete ${item.name}?`)) {
                           deleteInventoryItem(item.id);
                         }
                       }}>
                         <Trash2 size={16} color="var(--danger)" />
+=======
+                      <button className="btn-icon text-info" title="Edit" onClick={() => openEditModal(item)}>
+                        <Edit size={16} />
+                      </button>
+                      <button className="btn-icon text-danger" title="Delete" onClick={() => deleteInventoryItem(item.id)}>
+                        <Trash2 size={16} />
+>>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
                       </button>
                     </div>
                   </td>
@@ -573,6 +616,7 @@ const Inventory = () => {
         <div className="drawer-overlay" style={{ zIndex: 9999 }}>
           <div className="drawer-container">
             <div className="drawer-header">
+<<<<<<< HEAD
               <h2>Add New Product</h2>
               <button className="drawer-close-btn" onClick={() => { setShowAddModal(false); navigate('/inventory'); }}>
                 <X size={24} />
@@ -591,6 +635,19 @@ const Inventory = () => {
                       required 
                       placeholder="e.g. 10004 or Barcode Scan" 
                     />
+=======
+              <h2>{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
+              <button className="drawer-close-btn" onClick={closeModal}>
+                <Plus size={24} style={{ transform: 'rotate(45deg)' }} />
+              </button>
+            </div>
+            <div className="drawer-body">
+              <form id="add-product-form" onSubmit={handleSaveProduct}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+                  <div>
+                    <label className="text-muted text-sm block mb-1">Product ID / Barcode *</label>
+                    <input type="text" className="w-full" value={newProduct.id} onChange={e => setNewProduct({...newProduct, id: e.target.value})} required placeholder="e.g. 10004" disabled={!!editingProduct} />
+>>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
                   </div>
 
                   <div>
@@ -705,8 +762,16 @@ const Inventory = () => {
               </form>
             </div>
             <div className="drawer-footer">
+<<<<<<< HEAD
               <button type="button" className="btn-outline" onClick={() => { setShowAddModal(false); navigate('/inventory'); }}>Cancel</button>
               <button type="submit" form="add-product-form" className="btn-primary flex-align-gap"><Plus size={18} /> Save Product</button>
+=======
+              <button type="button" className="btn-outline" onClick={closeModal}>Cancel</button>
+              <button type="submit" form="add-product-form" className="btn-primary flex-align-gap">
+                {editingProduct ? <Edit size={18} /> : <Plus size={18} />} 
+                {editingProduct ? 'Update Product' : 'Save Product'}
+              </button>
+>>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
             </div>
           </div>
         </div>,

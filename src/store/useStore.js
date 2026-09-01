@@ -270,6 +270,7 @@ const useStore = create(
         }));
       },
 
+<<<<<<< HEAD
       // DUE SETTLEMENT
       settleCustomerDue: async (customerId, amount, dateStr) => {
         try {
@@ -285,6 +286,91 @@ const useStore = create(
             type: 'Customer',
             amount,
             date: dateStr || new Date().toISOString()
+=======
+      addCustomer: (customerData) => set((state) => ({
+        customers: [...state.customers, { id: 'C' + Date.now(), due: 0, ...customerData }]
+      })),
+
+      updateSupplier: (supplierId, updates) => set((state) => ({
+        suppliers: state.suppliers.map(s => s.id === supplierId ? { ...s, ...updates } : s)
+      })),
+
+      addExpense: (expense) => set((state) => ({
+        expenses: [{ id: Date.now(), ...expense }, ...state.expenses]
+      })),
+
+      // SR SETTLEMENTS
+      srSettlements: [],
+      issueProductsToSR: (settlementData) => set((state) => {
+        const newInventory = [...state.inventory];
+        settlementData.items.forEach(item => {
+          const invIndex = newInventory.findIndex(i => i.id === item.productId);
+          if (invIndex !== -1) {
+            newInventory[invIndex] = { ...newInventory[invIndex], stock: newInventory[invIndex].stock - item.quantity };
+          }
+        });
+        return {
+          inventory: newInventory,
+          srSettlements: [{ ...settlementData, id: 'SR' + Date.now(), status: 'Pending' }, ...(state.srSettlements || [])]
+        };
+      }),
+      updateSRSettlement: (id, updates) => set((state) => ({
+        srSettlements: (state.srSettlements || []).map(s => s.id === id ? { ...s, ...updates } : s)
+      })),
+      settleSRAccount: (id, cashReceived, returnItems = []) => set((state) => {
+        const newInventory = [...state.inventory];
+        returnItems.forEach(item => {
+           const invIndex = newInventory.findIndex(i => String(i.id) === String(item.productId));
+           if (invIndex !== -1) {
+             newInventory[invIndex] = { ...newInventory[invIndex], stock: newInventory[invIndex].stock + (item.returnQty || 0) };
+           }
+        });
+
+        const settlement = (state.srSettlements || []).find(s => s.id === id);
+        let dueAmount = 0;
+        if (settlement) {
+           const finalSales = returnItems.reduce((acc, item) => acc + ((item.issuedQty - item.returnQty) * item.price), 0);
+           dueAmount = Math.max(0, finalSales - cashReceived);
+        }
+
+        const newStaff = [...(state.staff || [])];
+        if (settlement && dueAmount > 0) {
+           const staffIndex = newStaff.findIndex(s => String(s.id) === String(settlement.salesmanId));
+           if (staffIndex !== -1) {
+              newStaff[staffIndex] = { ...newStaff[staffIndex], due: (newStaff[staffIndex].due || 0) + dueAmount };
+           }
+        }
+
+        return {
+          inventory: newInventory,
+          staff: newStaff,
+          srSettlements: (state.srSettlements || []).map(s => s.id === id ? { ...s, status: 'Settled', cashReceived, returnItems } : s)
+        };
+      }),
+      payStaffDue: (staffId, amount, dateStr) => set((state) => {
+        const date = dateStr || new Date().toISOString();
+        const settlementRecord = { id: 'STL' + Date.now(), targetId: staffId, type: 'Staff', amount, date };
+        return {
+          staff: state.staff.map(s => String(s.id) === String(staffId) ? { ...s, due: Math.max(0, (s.due || 0) - amount) } : s),
+          settlements: [settlementRecord, ...(state.settlements || [])]
+        };
+      }),
+
+      // HR ACTIONS
+      addStaff: (staffData) => set((state) => ({
+        staff: [...state.staff, { id: 'ST' + Date.now(), ...staffData }]
+      })),
+      
+      markAttendance: (staffId, date, status) => set((state) => {
+        const existingIndex = state.attendance.findIndex(a => a.staffId === staffId && a.date === date);
+        if (existingIndex !== -1) {
+          const newAttendance = [...state.attendance];
+          newAttendance[existingIndex] = { ...newAttendance[existingIndex], status };
+          return { attendance: newAttendance };
+        } else {
+          return {
+            attendance: [...state.attendance, { id: Date.now() + Math.random(), staffId, date, status }]
+>>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
           };
           set((state) => ({
             customers: state.customers.map((c) =>
@@ -422,6 +508,7 @@ const useStore = create(
         }
       },
 
+<<<<<<< HEAD
       // EXPENSES
       addExpense: async (expense) => {
         try {
@@ -438,6 +525,78 @@ const useStore = create(
           return fallback;
         }
       },
+=======
+      loadDummyData: () => set((state) => {
+        const todayStr = new Date().toISOString();
+        const justDate = todayStr.split('T')[0];
+        return {
+          inventory: [
+            { id: '10001', name: 'Bosch Impact Drill 13mm', category: 'Power Tools', stock: 15, unit: 'pcs', price: 3500, dateAdded: todayStr },
+            { id: '10002', name: 'Steel Wire Brush 4x16', category: 'Hand Tools', stock: 120, unit: 'pcs', price: 35, dateAdded: todayStr },
+            { id: '10003', name: 'Indian Lock Heavy Duty', category: 'Hardware', stock: 50, unit: 'pcs', price: 450, dateAdded: todayStr },
+            { id: '10004', name: 'Angle Grinder 4 inch', category: 'Machine Tools', stock: 25, unit: 'pcs', price: 2200, dateAdded: todayStr },
+          ],
+          customers: [
+            { id: 'C001', name: 'Fahim Traders', phone: '01719563699', location: 'Kotchandpur', due: 1020 },
+            { id: 'C002', name: 'Zaman Hardware', phone: '01811000000', location: 'Dhaka', due: 5000 },
+          ],
+          suppliers: [
+            { id: 'S001', name: 'Bosch Tools BD', phone: '01911000000', due: 15000 },
+            { id: 'S002', name: 'China Impex Ltd', phone: '01611000000', due: 50000 },
+          ],
+          staff: [
+            { id: 'ST001', name: 'Rashed', role: 'Store Incharge', baseSalary: 15000, joinDate: '2022-05-10' },
+            { id: 'ST002', name: 'Hasan', role: 'Delivery', baseSalary: 12000, joinDate: '2023-01-15' },
+          ],
+          sales: [
+            { id: 'INV' + (Date.now() - 86400000), date: new Date(Date.now() - 86400000).toISOString(), items: [{id: '10001', name: 'Bosch Impact Drill 13mm', quantity: 1, price: 3500, isGift: false}], subtotal: 3500, invoiceDiscount: 100, total: 3400, paymentType: 'Cash', customerId: 'C002', customerName: 'Zaman Hardware', salesmanId: 'ST001', salesmanName: 'Rashed', isGift: false },
+            { id: 'INV' + Date.now(), date: todayStr, items: [{id: '10002', name: 'Steel Wire Brush 4x16', quantity: 12, price: 35, isGift: false}], subtotal: 420, invoiceDiscount: 0, total: 420, paymentType: 'Baki', customerId: 'C001', customerName: 'Fahim Traders', salesmanId: 'ST002', salesmanName: 'Hasan', isGift: false }
+          ],
+          purchases: [
+            { id: 'PUR' + (Date.now() - 172800000), date: new Date(Date.now() - 172800000).toISOString(), items: [{name: 'Indian Lock Heavy Duty', quantity: 50, price: 350}], supplierId: 'S002', supplierName: 'China Impex Ltd', paymentType: 'Baki', total: 17500, paidAmount: 5000, dueAmount: 12500 }
+          ],
+          returns: [
+            { id: 'RET' + Date.now(), date: todayStr, returnType: 'Customer', productId: '10004', quantity: 1, reason: 'Motor issue' }
+          ],
+          settlements: [
+            { id: 'STL' + Date.now(), targetId: 'C001', type: 'Customer', amount: 500, date: todayStr }
+          ],
+          expenses: [
+            { id: 1, date: justDate, category: 'Transport', amount: 500, description: 'Carrying Loading for tools' },
+            { id: 2, date: justDate, category: 'Utility', amount: 1200, description: 'Electricity Bill' },
+          ],
+          attendance: [
+            { id: 1, staffId: 'ST001', date: justDate, status: 'Present' },
+            { id: 2, staffId: 'ST002', date: justDate, status: 'Late' }
+          ],
+          leaves: [
+            { id: 1, staffId: 'ST002', date: new Date(Date.now() + 86400000).toISOString().split('T')[0], type: 'Sick', reason: 'Fever', status: 'Pending' }
+          ],
+          payrolls: [
+            { id: 'PR' + Date.now(), staffId: 'ST001', staffName: 'Rashed', month: justDate.substring(0, 7), presentDays: 28, baseSalary: 15000, bonus: 2000, netPay: 17000, paymentDate: todayStr }
+          ],
+          smsHistory: [
+            { id: 'SMS1', date: todayStr, numbers: ['01719563699'], message: 'Dear Fahim Traders, your due amount is 1020 TK. Please clear it soon.', status: 'Sent' }
+          ],
+          srSettlements: [
+            {
+              id: 'SR_DUMMY_1',
+              date: justDate,
+              salesmanId: 'ST001',
+              salesmanName: 'Rashed',
+              items: [
+                { productId: '10001', name: 'Bosch Impact Drill 13mm', quantity: 2, price: 3500 },
+                { productId: '10002', name: 'Steel Wire Brush 4x16', quantity: 10, price: 35 }
+              ],
+              totalIssuedValue: 7350,
+              totalSalesValue: 7350,
+              cashReceived: 0,
+              status: 'Pending'
+            }
+          ]
+        };
+      }),
+>>>>>>> 52038308f59211e36b47b85f29e8d5b87d64a5bb
 
       // HR & PAYROLL
       addStaff: async (staffData) => {

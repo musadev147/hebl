@@ -4,10 +4,13 @@ import useStore from './store/useStore';
 import Login from './pages/Login';
 import Layout from './components/Layout';
 import Inventory from './pages/Inventory';
+import StockRegister from './pages/StockRegister';
+import SRSettlement from './pages/SRSettlement';
 import Purchase from './pages/Purchase';
 import Returns from './pages/Returns';
 import Suppliers from './pages/Suppliers';
 import Customers from './pages/Customers';
+import StaffDueList from './pages/StaffDueList';
 import Expenses from './pages/Expenses';
 import HR from './pages/HR';
 import Reports from './pages/Reports';
@@ -66,16 +69,19 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="pos" element={<POS />} />
           <Route path="inventory" element={<Inventory />} />
+          <Route path="stock" element={<StockRegister />} />
           <Route path="purchases" element={<Purchase />} />
           <Route path="/returns" element={<Returns />} />
           <Route path="/suppliers" element={<Suppliers />} />
           <Route path="/customers" element={<Customers />} />
+          <Route path="/staff-dues" element={<StaffDueList />} />
           <Route path="/sms" element={<SMS />} />
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/invoice" element={<BillInvoice />} />
           
           {/* Admin Only Routes */}
           <Route path="hr" element={<ProtectedRoute requiredRole="Admin"><HR /></ProtectedRoute>} />
+          <Route path="sr-settlements" element={<ProtectedRoute requiredRole="Admin"><SRSettlement /></ProtectedRoute>} />
           <Route path="reports" element={<ProtectedRoute requiredRole="Admin"><Reports /></ProtectedRoute>} />
           <Route path="settings" element={<ProtectedRoute requiredRole="Admin"><Settings /></ProtectedRoute>} />
         </Route>
