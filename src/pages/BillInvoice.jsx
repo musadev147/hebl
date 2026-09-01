@@ -193,7 +193,7 @@ const BillInvoice = () => {
                 <div className="cart-item glass" key={item.id}>
                   <div className="item-info">
                     <h4>{item.name}</h4>
-                    <span className="text-muted">ID: {item.id} | ৳{item.price} x {item.quantity}</span>
+                    <span className="text-muted">ID: {item.id} | {item.price} x {item.quantity}</span>
                   </div>
                   <div className="item-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <div className="quantity-control" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'var(--bg-input)', padding: '0.25rem', borderRadius: 'var(--radius-full)', border: '1px solid var(--border-color)' }}>
@@ -214,7 +214,7 @@ const BillInvoice = () => {
                       </button>
                     </div>
                     <div className="item-price" style={{ minWidth: '80px', textAlign: 'right', fontWeight: 'bold' }}>
-                      ৳{((item.price - (item.itemDiscount || 0)) * item.quantity).toLocaleString()}
+                      {((item.price - (item.itemDiscount || 0)) * item.quantity).toLocaleString()}
                     </div>
                     <button className="btn-icon text-danger" onClick={() => removeFromCart(item.id)}>
                       <Trash2 size={18} />
@@ -288,7 +288,7 @@ const BillInvoice = () => {
           <div className="checkout-section summary-section">
             <div className="summary-row">
               <span>Subtotal</span>
-              <span>৳{subtotal.toLocaleString()}</span>
+              <span>{subtotal.toLocaleString()}</span>
             </div>
             <div className="summary-row">
               <span>Discount</span>
@@ -302,7 +302,7 @@ const BillInvoice = () => {
             </div>
             <div className="summary-row total-row">
               <span>Total Amount</span>
-              <span className="text-primary text-xl">৳{total.toLocaleString()}</span>
+              <span className="text-primary text-xl">{total.toLocaleString()}</span>
             </div>
           </div>
 
@@ -346,8 +346,8 @@ const BillInvoice = () => {
                   <td>{s.date.split('T')[0]}</td>
                   <td>{s.id}</td>
                   <td>{s.customerName || 'N/A'}</td>
-                  <td>{s.items.length} items</td>
-                  <td className="text-primary font-bold">৳{s.total.toLocaleString()}</td>
+                  <td>{(s.items || []).length} items</td>
+                  <td className="text-primary font-bold">{s.total.toLocaleString()}</td>
                   <td style={{textAlign:'center'}}>
                     <div className="flex-align-gap" style={{justifyContent:'center'}}>
                       <button className="btn-icon" title="View & Print" onClick={() => setSelectedInvoice(s)}>
@@ -387,7 +387,7 @@ const BillInvoice = () => {
                   <td>{new Date(d.date).toLocaleString()}</td>
                   <td>{d.id}</td>
                   <td>{d.customerInfo?.name || 'Unknown'}</td>
-                  <td className="text-primary font-bold">৳{d.total.toLocaleString()}</td>
+                  <td className="text-primary font-bold">{d.total.toLocaleString()}</td>
                   <td style={{textAlign:'center'}}>
                     <button className="btn-primary" style={{ padding: '0.2rem 1rem', fontSize: '0.85rem' }} onClick={() => {
                        setCart(d.cartItems);

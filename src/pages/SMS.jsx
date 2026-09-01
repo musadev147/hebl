@@ -159,7 +159,7 @@ const SMS = () => {
                       </td>
                       <td>{c.name}</td>
                       <td>{c.phone || 'N/A'}</td>
-                      <td className={c.due > 0 ? 'text-danger font-bold' : 'text-success'}>৳{c.due}</td>
+                      <td className={c.due > 0 ? 'text-danger font-bold' : 'text-success'}>{c.due}</td>
                     </tr>
                   ))
                 )}

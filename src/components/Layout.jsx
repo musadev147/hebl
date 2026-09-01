@@ -94,13 +94,17 @@ const NavItem = ({ item, isMobileMenuOpen, setIsMobileMenuOpen }) => {
 };
 
 const Layout = () => {
-  const { user, logout, theme, toggleTheme } = useStore();
+  const { user, logout, theme, toggleTheme, fetchAllData } = useStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
+    fetchAllData();
+    const handleOnline = () => {
+      setIsOnline(true);
+      fetchAllData();
+    };
     const handleOffline = () => setIsOnline(false);
 
     window.addEventListener('online', handleOnline);
