@@ -6,7 +6,7 @@ const useStore = create(
     (set, get) => ({
       // App State
       user: null, // { id, name, role: 'Admin' | 'Salesman' }
-      theme: 'dark',
+      theme: 'light',
       activeThemeClass: 'theme-forest',
       toast: { show: false, message: '', type: 'success' },
 
