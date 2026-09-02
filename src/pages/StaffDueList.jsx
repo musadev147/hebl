@@ -3,7 +3,7 @@ import { Search, DollarSign, Download, Plus } from 'lucide-react';
 import useStore from '../store/useStore';
 
 const StaffDueList = () => {
-  const { staff, payStaffDue } = useStore();
+  const { staff, payStaffDue, showToast } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   
   const [showPayModal, setShowPayModal] = useState(false);
@@ -30,7 +30,7 @@ const StaffDueList = () => {
 
   const handlePayDue = () => {
     if (!selectedStaff || !payAmount || isNaN(payAmount) || parseFloat(payAmount) <= 0) {
-      alert('Please enter a valid amount.');
+      showToast('Please enter a valid amount.', 'error');
       return;
     }
     payStaffDue(selectedStaff.id, parseFloat(payAmount), payDate);

@@ -191,7 +191,7 @@ const Expenses = () => {
         <div className="drawer-overlay" onClick={() => setShowModal(false)}>
           <div className="drawer-container" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-header">
-              <h2>Add New Expense</h2>
+              <h2>Add Expense</h2>
               <button className="drawer-close-btn" onClick={() => setShowModal(false)}>
                 <X size={24} />
               </button>

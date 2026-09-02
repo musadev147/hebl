@@ -18,7 +18,7 @@ import Settings from './pages/Settings';
 import Dashboard from './pages/Dashboard';
 import POS from './pages/POS';
 import SMS from './pages/SMS';
-import BillInvoice from './pages/BillInvoice';
+import GlobalToast from './components/GlobalToast';
 
 // Placeholder Pages (will be extracted to separate files in later phases)
 
@@ -77,7 +77,6 @@ function App() {
           <Route path="/staff-dues" element={<StaffDueList />} />
           <Route path="/sms" element={<SMS />} />
           <Route path="/expenses" element={<Expenses />} />
-          <Route path="/invoice" element={<BillInvoice />} />
           
           {/* Admin Only Routes */}
           <Route path="hr" element={<ProtectedRoute requiredRole="Admin"><HR /></ProtectedRoute>} />
@@ -86,6 +85,7 @@ function App() {
           <Route path="settings" element={<ProtectedRoute requiredRole="Admin"><Settings /></ProtectedRoute>} />
         </Route>
       </Routes>
+      <GlobalToast />
     </Router>
   );
 }

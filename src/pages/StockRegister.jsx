@@ -7,7 +7,7 @@ import InvoiceHeader from '../components/InvoiceHeader';
 import PrintFooter from '../components/PrintFooter';
 
 const StockRegister = () => {
-  const { inventory, sales, purchases, returns, processPurchase } = useStore();
+  const { inventory, sales, purchases, returns, processPurchase, showToast } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   
   const [showAddModal, setShowAddModal] = useState(false);
@@ -94,7 +94,7 @@ const StockRegister = () => {
   const handleAddStock = (e) => {
     e.preventDefault();
     if (!addForm.id || !addForm.name || addForm.quantity <= 0) {
-      alert("Item ID, Name, and valid Quantity are required");
+      showToast("Item ID, Name, and valid Quantity are required", "error");
       return;
     }
     

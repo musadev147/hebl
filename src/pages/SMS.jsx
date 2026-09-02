@@ -4,7 +4,7 @@ import useStore from '../store/useStore';
 import { Send, MessageSquare, Users, Search, List } from 'lucide-react';
 
 const SMS = () => {
-  const { customers, user, smsHistory, addSmsToHistory } = useStore();
+  const { customers, user, smsHistory, addSmsToHistory, showToast } = useStore();
   const [selectedCustomers, setSelectedCustomers] = useState([]);
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState('');
@@ -58,11 +58,11 @@ const SMS = () => {
   const handleSendSMS = (e) => {
     e.preventDefault();
     if (selectedCustomers.length === 0) {
-      alert('Please select at least one customer.');
+      showToast('Please select at least one customer.', 'error');
       return;
     }
     if (!message.trim()) {
-      alert('Message cannot be empty.');
+      showToast('Message cannot be empty.', 'error');
       return;
     }
 
@@ -79,7 +79,7 @@ const SMS = () => {
         receivers: sentCustomersInfo
       });
       
-      alert(`SMS sent successfully to ${selectedCustomers.length} customers!`);
+      showToast(`SMS sent successfully to ${selectedCustomers.length} customers!`, 'success');
       setMessage('');
       setSelectedCustomers([]);
     }, 1500);

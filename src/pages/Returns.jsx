@@ -9,7 +9,7 @@ import PrintFooter from '../components/PrintFooter';
 import './Returns.css';
 
 const Returns = () => {
-  const { inventory, processReturn, returns } = useStore();
+  const { inventory, processReturn, returns, showToast } = useStore();
   const [activeTab, setActiveTab] = useState('New'); // 'New' or 'History'
   
   const location = useLocation();
@@ -40,7 +40,7 @@ const Returns = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!product) {
-      alert('Please select a product');
+      showToast('Please select a product', 'error');
       return;
     }
     
@@ -53,7 +53,7 @@ const Returns = () => {
       referenceId
     });
     
-    alert(`${returnType} Return/Reject processed successfully! Stock has been adjusted.`);
+    showToast(`${returnType} Return/Reject processed successfully! Stock has been adjusted.`, 'success');
     setProduct('');
     setQuantity(1);
     setReason('');
@@ -85,7 +85,7 @@ const Returns = () => {
       <div className="card glass mb-4" style={{ padding: '0.5rem' }}>
         <div className="return-type-selector" style={{ flexWrap: 'wrap', gap: '0.5rem' }}>
           <button className={`type-btn ${activeTab === 'New' ? 'active' : ''}`} onClick={() => setActiveTab('New')} style={{ padding: '0.5rem 1rem', flex: '1 1 auto', minWidth: '120px' }}>
-            <Plus size={16} className="inline-block mr-2" /> New Entry
+            <Plus size={16} className="inline-block mr-2" /> Entry
           </button>
           <button className={`type-btn ${activeTab === 'History' ? 'active' : ''}`} onClick={() => setActiveTab('History')} style={{ padding: '0.5rem 1rem', flex: '1 1 auto', minWidth: '120px' }}>
             <List size={16} className="inline-block mr-2" /> Returns History

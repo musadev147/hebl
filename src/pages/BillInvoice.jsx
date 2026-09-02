@@ -10,7 +10,7 @@ import PrintFooter from '../components/PrintFooter';
 import './POS.css'; // Reusing POS styles for speed and consistency
 
 const BillInvoice = () => {
-  const { inventory, staff, user, customers, addCustomer, processSale, sales } = useStore();
+  const { inventory, staff, user, customers, addCustomer, processSale, sales, showToast } = useStore();
   const [activeTab, setActiveTab] = useState('New'); // 'New', 'History', or 'Drafts'
   
   const location = useLocation();
@@ -70,7 +70,7 @@ const BillInvoice = () => {
       }
       setBarcodeInput('');
     } else {
-      alert('Product not found in inventory!');
+      showToast('Product not found in inventory!', 'error');
     }
   };
 
@@ -90,7 +90,7 @@ const BillInvoice = () => {
 
   const handleSaveDraft = () => {
     if (cart.length === 0) {
-      alert('Cannot save empty invoice as draft.');
+      showToast('Cannot save empty invoice as draft.', 'error');
       return;
     }
     const draftId = 'DRF' + Date.now();
@@ -105,7 +105,7 @@ const BillInvoice = () => {
       salesman: staff.find(s => s.id === selectedSalesman) || { id: 'Admin', name: 'Admin' }
     };
     setDrafts([...drafts, newDraft]);
-    alert('Invoice saved to Drafts!');
+    showToast('Invoice saved to Drafts!', 'success');
     setCart([]);
     setCustomerInfo({ name: '', phone: '', location: '' });
     setInvoiceDiscount(0);
@@ -114,7 +114,7 @@ const BillInvoice = () => {
 
   const handleCheckout = () => {
     if (!customerInfo.name) {
-      alert('Customer Name is explicitly required for invoicing!');
+      showToast('Customer Name is explicitly required for invoicing!', 'error');
       return;
     }
     
@@ -129,6 +129,7 @@ const BillInvoice = () => {
     
     processSale(saleData);
     setCompletedSale({ ...saleData, subtotal, total, date: new Date().toISOString(), invoiceId: 'INV' + Date.now() });
+    showToast("Invoice completed successfully!", "success");
     
     setCart([]);
     setCustomerInfo({ name: '', phone: '', location: '' });
@@ -145,7 +146,7 @@ const BillInvoice = () => {
             onClick={() => setActiveTab('New')}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
           >
-            <Plus size={16} /> Add New
+            <Plus size={16} /> Add
           </button>
           <button 
             type="button"

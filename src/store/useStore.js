@@ -8,6 +8,22 @@ const useStore = create(
       user: null, // { id, name, role: 'Admin' | 'Salesman' }
       theme: 'dark',
       activeThemeClass: 'theme-forest',
+      toast: { show: false, message: '', type: 'success' },
+
+      showToast: (message, type = 'success') => {
+        set({ toast: { show: true, message, type } });
+        setTimeout(() => {
+          set((state) => {
+            if (state.toast.message === message) {
+              return { toast: { ...state.toast, show: false } };
+            }
+            return state;
+          });
+        }, 3000);
+      },
+      
+      hideToast: () => set((state) => ({ toast: { ...state.toast, show: false } })),
+
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
       setThemeClass: (className) => set({ activeThemeClass: className }),
       login: (userData) => {
@@ -256,6 +272,10 @@ const useStore = create(
         };
       }),
 
+      updatePurchase: (id, updates) => set((state) => ({
+        purchases: state.purchases.map(p => p.id === id ? { ...p, ...updates } : p)
+      })),
+
       processReturn: ({ returnType, productId, quantity, reason }) => set((state) => {
         const newInventory = [...state.inventory];
         const invIndex = newInventory.findIndex(i => i.id === productId);
@@ -301,6 +321,10 @@ const useStore = create(
         customers: [...state.customers, { id: 'C' + Date.now(), due: 0, ...customerData }]
       })),
 
+      updateCustomer: (customerId, updates) => set((state) => ({
+        customers: state.customers.map(c => c.id === customerId ? { ...c, ...updates } : c)
+      })),
+
       updateSupplier: (supplierId, updates) => set((state) => ({
         suppliers: state.suppliers.map(s => s.id === supplierId ? { ...s, ...updates } : s)
       })),
@@ -327,6 +351,41 @@ const useStore = create(
       updateSRSettlement: (id, updates) => set((state) => ({
         srSettlements: (state.srSettlements || []).map(s => s.id === id ? { ...s, ...updates } : s)
       })),
+      updateSRIssuedItems: (id, updatedReturnItems) => set((state) => {
+        const newInventory = [...state.inventory];
+        const settlement = (state.srSettlements || []).find(s => s.id === id);
+        if (!settlement) return state;
+
+        updatedReturnItems.forEach(item => {
+           const originalItem = settlement.items.find(i => String(i.productId) === String(item.productId));
+           const originalQty = originalItem ? originalItem.quantity : 0;
+           const diff = item.issuedQty - originalQty;
+           
+           if (diff !== 0) {
+              const invIndex = newInventory.findIndex(i => String(i.id) === String(item.productId));
+              if (invIndex !== -1) {
+                 newInventory[invIndex] = { ...newInventory[invIndex], stock: newInventory[invIndex].stock - diff };
+              }
+           }
+        });
+
+        const updatedItems = settlement.items.map(orig => {
+           const rItem = updatedReturnItems.find(r => String(r.productId) === String(orig.productId));
+           if (rItem) {
+              return { ...orig, quantity: rItem.issuedQty };
+           }
+           return orig;
+        });
+
+        const newTotalIssued = updatedItems.reduce((acc, item) => acc + (item.quantity * item.price), 0);
+
+        return {
+          inventory: newInventory,
+          srSettlements: state.srSettlements.map(s => 
+            s.id === id ? { ...s, items: updatedItems, totalIssuedValue: newTotalIssued, totalSalesValue: newTotalIssued } : s
+          )
+        };
+      }),
       settleSRAccount: (id, cashReceived, returnItems = []) => set((state) => {
         const newInventory = [...state.inventory];
         returnItems.forEach(item => {
@@ -354,8 +413,46 @@ const useStore = create(
         return {
           inventory: newInventory,
           staff: newStaff,
-          srSettlements: (state.srSettlements || []).map(s => s.id === id ? { ...s, status: 'Settled', cashReceived, returnItems } : s)
+          srSettlements: state.srSettlements.map(s => 
+            s.id === id ? { 
+              ...s, 
+              status: 'Settled', 
+              cashReceived, 
+              returnItems: returnItems.filter(r => r.returnQty > 0),
+              items: updatedItems,
+              totalIssuedValue,
+              totalSalesValue: finalSales
+            } : s
+          )
         };
+      }),
+      settleBulkSR: (settlementIds) => set((state) => {
+        const newSettlements = (state.srSettlements || []).map(s => {
+          if (settlementIds.includes(s.id) && s.status === 'Pending') {
+            return {
+              ...s,
+              status: 'Settled',
+              cashReceived: s.totalSalesValue || 0,
+              returnItems: []
+            };
+          }
+          return s;
+        });
+        return { srSettlements: newSettlements };
+      }),
+      unsettleBulkSR: (settlementIds) => set((state) => {
+        const newSettlements = (state.srSettlements || []).map(s => {
+          if (settlementIds.includes(s.id) && s.status === 'Settled') {
+            return {
+              ...s,
+              status: 'Pending',
+              cashReceived: 0,
+              returnItems: []
+            };
+          }
+          return s;
+        });
+        return { srSettlements: newSettlements };
       }),
       payStaffDue: (staffId, amount, dateStr) => set((state) => {
         const date = dateStr || new Date().toISOString();
@@ -368,7 +465,11 @@ const useStore = create(
 
       // HR ACTIONS
       addStaff: (staffData) => set((state) => ({
-        staff: [...state.staff, { id: 'ST' + Date.now(), ...staffData }]
+        staff: [{ id: 'ST' + Date.now(), ...staffData }, ...state.staff]
+      })),
+
+      updateStaff: (staffId, updates) => set((state) => ({
+        staff: state.staff.map(s => s.id === staffId ? { ...s, ...updates } : s)
       })),
       
       markAttendance: (staffId, date, status) => set((state) => {

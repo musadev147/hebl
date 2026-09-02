@@ -127,14 +127,11 @@ const Layout = () => {
       name: 'Sales & Billing', 
       icon: <ShoppingCart size={20} />,
       subItems: [
-        { path: '/pos?action=add', search: '?action=add', name: 'POS (New Sale)' },
+        { path: '/pos?action=add', search: '?action=add', name: 'POS (Sale)' },
         { path: '/pos', search: '', name: 'POS Sales List' },
-        { path: '/invoice?action=add', search: '?action=add', name: 'New Invoice' },
-        { path: '/invoice', search: '', name: 'Invoice List' },
-        { path: '/invoice?action=draft', search: '?action=draft', name: 'Draft Invoice' },
-        { path: '/returns?action=add', search: '?action=add', name: 'New Return' },
+        { path: '/returns?action=add', search: '?action=add', name: 'Return' },
         { path: '/returns', search: '', name: 'Return List' },
-        { path: '/sr-settlements', search: '', name: 'SR Daily Accounts' },
+        { path: '/sr-settlements', search: '', name: 'Order Process' },
       ]
     },
     { 
@@ -143,7 +140,7 @@ const Layout = () => {
       subItems: [
         { path: '/inventory?action=add', search: '?action=add', name: 'Add Product' },
         { path: '/inventory', search: '', name: 'Product List' },
-        { path: '/purchases?action=add', search: '?action=add', name: 'New Purchase' },
+        { path: '/purchases?action=add', search: '?action=add', name: 'Purchase' },
         { path: '/purchases', search: '', name: 'Purchase List' },
         { path: '/stock', search: '', name: 'Stock Form' },
       ]

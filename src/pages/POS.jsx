@@ -10,7 +10,7 @@ import PrintFooter from '../components/PrintFooter';
 import './POS.css';
 
 const POS = () => {
-  const { cart, inventory, staff, user, customers, addToCart, removeFromCart, updateCartItem, clearCart, loadDummyData, processSale, sales } = useStore();
+  const { cart, inventory, staff, user, customers, addToCart, removeFromCart, updateCartItem, clearCart, loadDummyData, processSale, sales, showToast } = useStore();
   const [activeTab, setActiveTab] = useState('New'); // 'New' or 'History'
   
   const location = useLocation();
@@ -61,7 +61,7 @@ const POS = () => {
       addToCart({ ...product, isGift: false, itemDiscount: 0 });
       setBarcodeInput('');
     } else {
-      alert('Product not found!');
+      showToast('Product not found!', 'error');
     }
   };
 
@@ -78,7 +78,7 @@ const POS = () => {
 
   const handleCheckout = () => {
     if (!customerInfo.name) {
-      alert('Customer Name is explicitly required for all sales!');
+      showToast('Customer Name is explicitly required for all sales!', 'error');
       return;
     }
     
@@ -93,6 +93,7 @@ const POS = () => {
     
     processSale(saleData);
     setCompletedSale({ ...saleData, subtotal, total, date: new Date().toISOString(), invoiceId: 'INV' + Date.now() });
+    showToast("Sale completed successfully!", "success");
     
     clearCart();
     setCustomerInfo({ name: '', phone: '', location: '' });
