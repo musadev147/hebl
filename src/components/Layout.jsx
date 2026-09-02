@@ -21,7 +21,8 @@ import {
   Plus,
   Minus,
   ChevronsRight,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Menu
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -96,6 +97,7 @@ const NavItem = ({ item, isMobileMenuOpen, setIsMobileMenuOpen }) => {
 const Layout = () => {
   const { user, logout, theme, toggleTheme, fetchAllData } = useStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const navigate = useNavigate();
 
@@ -189,15 +191,21 @@ const Layout = () => {
 
   return (
     <div className="app-container">
-      <aside className="sidebar glass">
+      <aside className={`sidebar glass ${isSidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <img src={logoImg} alt="EHBL Logo" style={{ height: '45px', width: '45px', borderRadius: '8px', objectFit: 'contain', background: 'white' }} />
-            <div>
+          <div className="sidebar-brand-container" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img src={logoImg} alt="EHBL Logo" className="sidebar-logo" style={{ height: '45px', width: '45px', borderRadius: '8px', objectFit: 'contain', background: 'white' }} />
+            <div className="sidebar-brand-text">
               <h2>EHBL</h2>
               <span className="role-badge">{user?.role}</span>
             </div>
           </div>
+          <button 
+            className="desktop-menu-toggle btn-icon" 
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          >
+            <Menu size={20} />
+          </button>
           <button 
             className="mobile-menu-toggle btn-icon" 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
